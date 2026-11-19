@@ -1,0 +1,15 @@
+node_modules
+dist
+shots
+*.log
+.wrangler
+.agents/
+.codex/
+.aws/
+__pycache__/
+*.py[cod]
+*.tsbuildinfo
+.*-tmp.mjs
+.env
+.env.*
+!.env.example

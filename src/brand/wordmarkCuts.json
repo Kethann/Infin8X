@@ -1,0 +1,11 @@
+{
+  "description": "Source-artwork coordinates for the existing tapered slits. Wider separation helps them read in the small wordmark; the main logo is untouched.",
+  "width": 32,
+  "curves": [
+    { "name": "white outer sweep", "points": [[44,278],[15,450],[52,560],[184,634]] },
+    { "name": "white lower tail", "points": [[185,780],[322,864],[475,927],[620,915]] },
+    { "name": "white inner slash", "points": [[885,772],[1005,701],[1123,621],[1176,568]] },
+    { "name": "colour outer sweep", "points": [[2746,260],[2770,432],[2710,550],[2640,599]] },
+    { "name": "colour lower tail", "points": [[2135,920],[2320,910],[2480,838],[2600,770]] }
+  ]
+}

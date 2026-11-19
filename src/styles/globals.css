@@ -1,0 +1,245 @@
+@import './tokens.css';
+@import './components.css';
+@import './chrome.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face { font-family: 'Ariovex'; src: url('/fonts/Ariovex-Regular.otf') format('opentype'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Ariovex'; src: url('/fonts/Ariovex-Italic.otf') format('opentype'); font-style: italic; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Turbo Driver'; src: url('/fonts/Turbo-Driver-Italic.otf') format('opentype'); font-style: italic; font-weight: 400; font-display: swap; }
+
+html { background: var(--c-base); color: var(--c-text); -webkit-text-size-adjust: 100%; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+body { font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.6; background: #020611; overflow-x: hidden; }
+/* Prevent accidental selection while dragging or tapping display text. Keep form editing native. */
+body { -webkit-user-select: none; user-select: none; }
+input, textarea, [contenteditable]:not([contenteditable='false']) {
+  -webkit-user-select: text; user-select: text;
+}
+::selection { background: rgba(77,124,255,0.4); }
+/* Shared geometric type connects the navigation, chapters and service cards. */
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; letter-spacing: -.035em; line-height: 1.1; }
+:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; border-radius: 6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.skip-link { position: fixed; left: 16px; top: -60px; z-index: 100; padding: 10px 16px; background: var(--c-surface); border-radius: 10px; }
+.skip-link:focus { top: 16px; }
+
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: var(--fs-mono); letter-spacing: 0.14em; text-transform: uppercase; }
+.page { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: var(--gutter); }
+
+/* ---------- buttons ---------- */
+.btn { position: relative; display: inline-flex; align-items: center; gap: .5em; padding: .9em 1.5em; border-radius: 999px;
+  min-height: 48px; justify-content: center; font-family: var(--font-display); font-size: .9375rem; line-height: 1.35; letter-spacing: .005em; font-weight: 500;
+  transition: transform var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out), background var(--dur-1); isolation: isolate; }
+.btn--primary { background: var(--c-text); color: var(--c-base); }
+.btn--primary::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; background: rgba(255,255,255,.15); z-index: -1; opacity: 0; filter: blur(12px); transition: opacity var(--dur-1); }
+.btn--primary:hover::before, .btn--primary:focus-visible::before { opacity: .7; }
+.btn--ghost { color: var(--c-text); background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+.btn--ghost:hover { background: rgba(255,255,255,.1); }
+.btn:hover:not(:disabled) { transform: translateY(-2px); }
+
+.btn:disabled { cursor: wait; opacity: .65; }
+
+/* ---------- hero ---------- */
+.hero { position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; background: #020611; isolation: isolate; }
+.hero__space, .hero__code, .hero__gl, .hero__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero__space { z-index: 0; opacity: 0; display: none; }
+.hero--nogl .hero__space { display: block; }
+/* code streams: kept out of the logo and the headline so they read as distant background activity */
+.hero__code { z-index: 2; opacity: 0; mix-blend-mode: screen; filter: blur(.6px); animation: codein 3s 1s ease forwards;
+  -webkit-mask-image: radial-gradient(ellipse 50% 34% at 50% 44%, transparent 45%, #000 100%); mask-image: radial-gradient(ellipse 50% 34% at 50% 44%, transparent 45%, #000 100%); }
+@keyframes codein { to { opacity: .42; } }
+.hero__gl { z-index: 1; touch-action: pan-y;
+  /* Let the water and dark sky dissolve into the page before the canvas ends.
+     Feather only the atmosphere so the wordmark and controls stay crisp. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 64%, rgba(0,0,0,.95) 72%, rgba(0,0,0,.75) 80%, rgba(0,0,0,.4) 88%, rgba(0,0,0,.12) 95%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 64%, rgba(0,0,0,.95) 72%, rgba(0,0,0,.75) 80%, rgba(0,0,0,.4) 88%, rgba(0,0,0,.12) 95%, transparent 100%);
+}
+.hero__canvas { z-index: 3; pointer-events: none; }
+.hero--3d { cursor: grab; touch-action: pan-y; }
+.hero--3d.is-dragging { cursor: grabbing; }
+.hero--nogl .hero__space { background: transparent; }
+.hero__hint { position: absolute; left: 50%; top: calc(var(--logo-top, 20vh) - 44px); transform: translateX(-50%); z-index: 5; display: flex; gap: 10px; align-items: center;
+  color: var(--c-muted); font-size: .6875rem; letter-spacing: .28em; text-transform: uppercase; opacity: 0; transition: opacity 1s var(--ease-out); pointer-events: none; }
+.hero__hint i { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); position: relative; }
+.hero__hint i::after { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: #fff; animation: hintdrag 2.4s var(--ease-light) infinite; }
+@keyframes hintdrag { 0%, 100% { transform: translateX(-5px); } 50% { transform: translateX(5px); } }
+.hero__hint:not(.is-on) i::after { animation: none; }
+.hero__hint.is-on { opacity: .85; }
+@media (max-width: 767px) { .hero__hint { top: auto; bottom: 78px; } }
+.hero { --logo-bottom-css: calc(40svh + 14.74vw); }
+@media (min-width: 768px) { .hero { --logo-bottom-css: calc(43svh + min(12.8vw, 205px, 30svh)); } }
+/* default mirrors heroRenderer.resize() so the copy never jumps when JS sets the exact value */
+.hero__word { display: inline-block; opacity: 0; will-change: filter, opacity, transform; }
+.hero__ctas { margin-top: clamp(20px, 3.5vh, 36px); display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; opacity: 0; }
+.hero__skip { position: absolute; right: var(--gutter); bottom: 24px; z-index: 6; font-family: 'JetBrains Mono', monospace; font-size: .75rem; letter-spacing: .16em; text-transform: uppercase; color: var(--c-muted);
+  padding: 10px 16px; border-radius: 999px; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); transition: color .3s, background .3s; }
+.hero__skip:hover { color: var(--c-text); background: rgba(255,255,255,.09); }
+.hero__copy { transition: opacity .2s; }
+.hero[style*='--hero-exit'] .hero__copy { opacity: calc(1 - var(--hero-exit) * 1.6); transform: translateY(calc(var(--hero-exit) * -60px)); }
+.hero[style*='--hero-exit'] .hero__gl, .hero[style*='--hero-exit'] .hero__canvas { opacity: var(--hero-atmosphere-opacity, 1); transform: translateY(calc(var(--hero-exit) * -80px)); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  .hero__word, .hero__ctas, [data-letter] { opacity: 1 !important; }
+}
+
+/* ---------- wordmark: the ∞ settles in as the 8 of Infin8X ---------- */
+.hero { --wm-size: clamp(56px, 11.5vw, 184px); --wm-center: 43svh; }
+@media (max-width: 767px) { .hero { --wm-center: 40svh; --wm-size: clamp(44px, 15vw, 100px); } }
+.hero__copy { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 5; pointer-events: none; text-align: center; padding-inline: var(--gutter); }
+.hero__copy a, .hero__copy button { pointer-events: auto; }
+.hero__copy::before { content: ''; position: absolute; left: 50%; top: calc(var(--wm-center) + var(--wm-size) * .25); width: min(1100px, 110vw); height: calc(var(--wm-size) * 2.6); transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(3,3,5,.62), rgba(3,3,5,.35) 55%, transparent); pointer-events: none; z-index: -1; opacity: var(--copy-pool, 0); transition: opacity 1.2s ease; }
+.hero.is-settled .hero__copy::before { --copy-pool: 1; }
+.hero__wordmark { position: absolute; left: 0; right: 0; top: var(--wm-center); transform: translateY(-50%); margin: 0; }
+.hero__wm { display: inline-flex; align-items: center; justify-content: center; font-family: 'Unbounded', 'Space Grotesk', system-ui, sans-serif; font-weight: 500;
+  font-size: var(--wm-size); line-height: 1; letter-spacing: -0.01em; color: #f5f6fa; }
+.hero__wm [data-letter] { opacity: 0; display: inline-block;
+  background: linear-gradient(175deg, #ffffff 12%, #e7edf7 48%, #a2afc4 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 8px 32px rgba(105,145,210,.08); }
+@keyframes wmsheen { 0%, 70% { background-position: 0 0, 160% 0; } 100% { background-position: 0 0, -60% 0; } }
+.hero__eight { position: relative; display: inline-block; height: .96em; width: .4em; margin: 0 .12em 0 .06em; }
+.hero__eight svg { position: absolute; left: 50%; top: 50%; width: .96em; height: auto; transform: translate(-50%, -50%) rotate(-90deg); }
+.hero--3d .hero__eight svg { visibility: hidden; }          /* the real 3D loop takes this place */
+.hero--2d .hero__eight svg { visibility: visible; }
+.hero__tagline { position: absolute; left: 0; right: 0; top: calc(var(--wm-center) + var(--wm-size) * .52 + clamp(14px, 3vh, 34px));
+  font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 500; font-size: clamp(1rem, .85rem + .8vw, 1.45rem); letter-spacing: .015em; color: #b8c5d9; padding-inline: var(--gutter); }
+.hero__ctas { position: absolute; left: 0; right: 0; top: calc(var(--wm-center) + var(--wm-size) * .52 + clamp(64px, 10vh, 110px)); margin: 0; }
+.hero__hint { top: calc(var(--wm-center) - var(--wm-size) * .62 - 28px) !important; }
+@media (max-width: 767px) { .hero__hint { bottom: auto !important; } }
+/* the 2D artwork fallback keeps its big mark: the wordmark sits underneath it */
+.hero--2d { --wm-center: calc(var(--logo-bottom, 70svh) + var(--wm-size) * .55 + 12px); --wm-size: clamp(44px, 7vw, 96px); }
+/* lite (no GPU): the wordmark with the flat mark as its 8, painted at once */
+.hero--lite .hero__eight svg { visibility: visible; animation: liteeight 1.4s var(--ease-out) both; }
+@keyframes liteeight { from { opacity: 0; transform: translate(-50%, -50%) rotate(0deg) scale(2.4); } to { opacity: 1; transform: translate(-50%, -50%) rotate(-90deg) scale(1); } }
+.hero--lite [data-letter], .hero--lite .hero__word, .hero--lite .hero__ctas, .hero--lite [data-grain], .hero--lite [data-space] { opacity: 1; }
+.hero--lite .hero__gl, .hero--lite .hero__canvas { display: none; }
+/* Lite path: a static, CSS-only echo of the aurora curtain (no canvas). */
+.hero.hero--exact.hero--lite { background:
+  radial-gradient(60% 12% at 50% 86%, rgba(60,140,255,.28), transparent 70%),
+  linear-gradient(90deg, rgba(20,200,150,.10), transparent 22%, transparent 70%, rgba(150,70,255,.10) 86%, rgba(60,120,255,.08)),
+  linear-gradient(#010309 0%, #020818 55%, #04122e 86%, #010309 100%); }
+@media (max-height: 650px) and (min-width: 768px) { .hero { --wm-size: clamp(56px, 10vw, 130px); } }
+
+/* Original extracted artwork: no type, recolouring, or geometric approximation. */
+.hero--exact { perspective: 1400px; height: auto; min-height: max(560px, 100svh); padding-bottom: clamp(56px, 8svh, 96px); --hero-wordmark-gap: 12px;
+  --hero-artwork-width: min(84vw, 1120px, 125svh);
+  --hero-artwork-height: calc(var(--hero-artwork-width) * 936 / 2787);
+  --hero-artwork-top: clamp(112px, 18svh, 220px); }
+.hero__artwork-stage { position: absolute; z-index: 4; width: var(--hero-artwork-width); left: 0; right: 0; margin-inline: auto; top: var(--hero-artwork-top); transform-style: preserve-3d; pointer-events: none; }
+.hero__original { display: block; width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 20px 32px rgba(0,0,0,.3)); transform-origin: center; }
+.hero__details { position: relative; z-index: 5; width: 100%; max-width: 840px; margin-inline: auto; padding: calc(var(--hero-artwork-top) + var(--hero-artwork-height) + var(--hero-wordmark-gap)) var(--gutter) 0; text-align: center; pointer-events: none; }
+.hero__details > * { pointer-events: auto; }
+.hero--exact .hero__tagline { position: static; max-width: 38ch; margin: 0 auto; padding: 0; line-height: 1.45; text-wrap: balance; }
+.hero__summary { max-width: 38ch; margin: 10px auto 0; font-size: clamp(.9375rem, .9rem + .2vw, 1.0625rem); line-height: 1.6; color: #aebbd0; text-wrap: balance; }
+.hero__brand { display: flex; justify-content: center; align-items: center; margin-bottom: clamp(14px, 2svh, 20px);
+  /* the artwork is asymmetric: its crossing (the X) sits ~2.6% of its width left of centre, so the wordmark is centred
+     on the crossing, not on the screen. Offset with `left`: GSAP owns transform here and folds a CSS `translate` into it. */
+  position: relative; left: calc(var(--hero-artwork-width) * -.026); }
+.wordmark-reveal { position: relative; display: inline-flex; font-size: clamp(34px, 5.2vw, 72px); line-height: 1; isolation: isolate; max-width: 100%; }
+.wordmark-reveal__definitions { position: absolute; width: 0; height: 0; overflow: hidden; }
+.wordmark-reveal__face { display: flex; padding: .14em .1em; margin: -.14em -.1em; }
+.wordmark-reveal__beams { position: absolute; inset: -.7em -.1em -.6em; pointer-events: none; mix-blend-mode: screen; }
+.wordmark-reveal__beams > span { position: absolute; top: 0; bottom: 0; opacity: 0; border-radius: 50%; filter: blur(.35px); transform-origin: 50% 50%; }
+.hero.is-settled .wordmark-reveal__face, .hero--lite .wordmark-reveal__face { -webkit-mask-image: none !important; mask-image: none !important; filter: none !important; }
+.hero.is-settled .wordmark-reveal__beams, .hero--lite .wordmark-reveal__beams { display: none; }
+.wordmark-cycle { position: relative; display: inline-flex; align-items: center; }
+.wordmark-cycle__brand { display: inline-flex; padding: .14em .1em; margin: -.14em -.1em; }
+/* Fully revealed type stays crisp; masks are needed only during the handoff. */
+.wordmark-cycle[data-wordmark-state='brand'] .wordmark-cycle__brand,
+.wordmark-cycle[data-wordmark-state='experience'] .wordmark-cycle__experience { -webkit-mask-image: none !important; mask-image: none !important; }
+.wordmark-cycle__glows { position: absolute; inset: -.18em -.1em; pointer-events: none; mix-blend-mode: screen; }
+.wordmark-cycle__glows > span { position: absolute; top: 0; bottom: 0; opacity: 0; border-radius: 50%; background: linear-gradient(180deg, transparent 4%, currentColor 38%, #fff 50%, currentColor 62%, transparent 96%); box-shadow: 0 0 5px 1px currentColor; filter: blur(.35px); transform-origin: 50% 50%; }
+.wordmark-cycle__experience { position: absolute; inset: -.14em -.1em; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; white-space: nowrap; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: .46em; font-weight: 500; letter-spacing: .035em; text-transform: uppercase; color: #edf2ff; text-shadow: 0 0 18px rgb(144 167 255 / .18); }
+.brand-wordmark { display: inline-flex; align-items: baseline; justify-content: center; gap: .01em; height: 1em; max-width: 100%; font-size: clamp(34px, 5.2vw, 72px); line-height: 1; font-weight: 400; white-space: nowrap; color: #f1f4fa; }
+/* A restrained silver face keeps the lettering crisp beside the coloured ribbon. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .brand-wordmark__end, .brand-wordmark__middle {
+    /* Reveal-style filaments: fixed x coordinates, vertical heads and soft tails. */
+    --wm-hover-cool: radial-gradient(ellipse at 50% 46%, rgb(239 245 255 / var(--wm-hover-strength, 0)) 0%, rgb(144 167 255 / var(--wm-hover-strength, 0)) 16%, rgb(133 183 255 / calc(var(--wm-hover-strength, 0) * .4)) 42%, transparent 72%);
+    --wm-hover-warm: radial-gradient(ellipse at 50% 46%, rgb(250 240 255 / var(--wm-hover-strength, 0)) 0%, rgb(225 155 227 / var(--wm-hover-strength, 0)) 16%, rgb(180 155 255 / calc(var(--wm-hover-strength, 0) * .4)) 42%, transparent 72%);
+    background-image:
+      var(--wm-hover-cool), var(--wm-hover-warm), var(--wm-hover-cool), var(--wm-hover-warm), var(--wm-hover-cool),
+      radial-gradient(ellipse at 50% 46%, rgb(240 245 255 / var(--wm-a-strength, 0)) 0%, rgb(var(--wm-a-colour, 121 181 255) / var(--wm-a-strength, 0)) 16%, rgb(var(--wm-a-colour, 121 181 255) / calc(var(--wm-a-strength, 0) * .4)) 42%, transparent 72%),
+      radial-gradient(ellipse at 50% 46%, rgb(245 240 255 / var(--wm-b-strength, 0)) 0%, rgb(var(--wm-b-colour, 175 145 255) / var(--wm-b-strength, 0)) 16%, rgb(var(--wm-b-colour, 175 145 255) / calc(var(--wm-b-strength, 0) * .4)) 42%, transparent 72%),
+      linear-gradient(180deg, #fff 18%, #eef3fc 52%, #b9c8df 100%);
+    /* Feather across each filament as well as along it; varied lengths keep
+       the centre-out response organic while the silver letter stays intact. */
+    background-size:
+      1.5px calc(var(--wm-flow-height, 50px) * .72),
+      2px calc(var(--wm-flow-height, 50px) * 1.05),
+      2.5px calc(var(--wm-flow-height, 50px) * 1.3),
+      1.75px calc(var(--wm-flow-height, 50px) * .9),
+      1.5px calc(var(--wm-flow-height, 50px) * .8),
+      var(--wm-a-width, 2px) calc(var(--wm-flow-height, 50px) * var(--wm-a-length, 1.15)),
+      var(--wm-b-width, 1.5px) calc(var(--wm-flow-height, 50px) * var(--wm-b-length, 1)),
+      100% 100%;
+    background-position:
+      calc(var(--wm-flow-width, 0px) * (var(--wm-hover-column, .5) - .041667) - var(--wm-flow-offset, 0px)) calc(var(--wm-flow-height, 50px) * var(--wm-hover-phase-0, -1.45)),
+      calc(var(--wm-flow-width, 0px) * (var(--wm-hover-column, .5) - .020833) - var(--wm-flow-offset, 0px)) calc(var(--wm-flow-height, 50px) * var(--wm-hover-phase-1, -1.45)),
+      calc(var(--wm-flow-width, 0px) * var(--wm-hover-column, .5) - var(--wm-flow-offset, 0px)) calc(var(--wm-flow-height, 50px) * var(--wm-hover-phase-2, -1.45)),
+      calc(var(--wm-flow-width, 0px) * (var(--wm-hover-column, .5) + .020833) - var(--wm-flow-offset, 0px)) calc(var(--wm-flow-height, 50px) * var(--wm-hover-phase-3, -1.45)),
+      calc(var(--wm-flow-width, 0px) * (var(--wm-hover-column, .5) + .041667) - var(--wm-flow-offset, 0px)) calc(var(--wm-flow-height, 50px) * var(--wm-hover-phase-4, -1.45)),
+      calc(var(--wm-flow-width, 0px) * var(--wm-a-column, .3) - var(--wm-flow-offset, 0px)) calc(var(--wm-flow-height, 50px) * var(--wm-a-phase, -1.45)),
+      calc(var(--wm-flow-width, 0px) * var(--wm-b-column, .7) - var(--wm-flow-offset, 0px)) calc(var(--wm-flow-height, 50px) * var(--wm-b-phase, -1.45)),
+      0 0;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+}
+/* Match the fonts' measured cap heights; allow room for Turbo Driver's italic overhang. */
+.brand-wordmark__end { font-family: 'Turbo Driver', sans-serif; font-style: italic; font-synthesis: none; font-size: 1.202em; line-height: .832; padding-right: .11em; transform: translateY(.0713em); }
+.brand-wordmark__middle { font-family: 'Ariovex', sans-serif; font-style: italic; font-synthesis: none; letter-spacing: .035em; padding-inline: .08em .06em; }
+/* Preserve the source symbol's cuts and colours, sized to the lettering's cap height.
+   Widen the upright mark to a character's proportions; match Ariovex's 12-degree slant. */
+.brand-wordmark__eight { position: relative; display: inline-block; align-self: center; flex: 0 0 .72em; width: .72em; height: .78em; margin-inline: .015em .025em; transform: translateY(.02em) skewX(-12deg); }
+.brand-wordmark__eight .flow-mark { position: absolute; top: 50%; left: 50%; width: .78em; aspect-ratio: 2787 / 936; transform: translate(-50%, -50%) scaleX(2.4) rotate(-90deg); }
+.flow-mark > img, .flow-mark > canvas { display: block; width: 100%; height: 100%; }
+.flow-mark > canvas { position: absolute; inset: 0; opacity: 0; }
+.flow-mark--ready > img { opacity: 0; }
+.flow-mark--ready > canvas { opacity: 1; }
+.brand-wordmark__x { margin-left: -.09em; }
+.hero--exact .hero__ctas { position: static; opacity: 1; margin-top: clamp(20px, 3svh, 28px); gap: 12px; }
+.hero--exact .hero__ctas .btn { min-height: 48px; min-width: 152px; justify-content: center; }
+.hero--exact.hero--lite .hero__gl { display: none; }
+@media (min-width: 768px) and (orientation: portrait) {
+  .hero--exact { min-height: clamp(640px, 84svh, 960px); }
+}
+@media (max-width: 767px) {
+  .hero--exact { min-height: clamp(560px, 78svh, 740px); --hero-artwork-width: min(90vw, 640px);
+    --hero-artwork-top: clamp(136px, 22svh, 204px); }
+  .hero__details { max-width: 440px; }
+  .hero--exact .hero__ctas { gap: 10px; max-width: 360px; margin-inline: auto; }
+  .hero--exact .hero__ctas .btn { flex: 1 1 140px; min-width: 0; padding: 12px 10px; font-size: .875rem; letter-spacing: 0; white-space: normal; }
+}
+/* Short windows keep the mark below navigation and the actions in reach. */
+@media (max-height: 520px) {
+  .hero--exact { min-height: max(500px, 100svh);
+    --hero-artwork-top: 104px; --hero-artwork-width: min(76vw, 660px, 110svh); }
+  .hero__brand { margin-bottom: 12px; }
+  .hero--exact .hero__ctas { margin-top: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .hero__original, .hero__artwork-stage { transform: none !important; } }
+
+/* The source image remains the accessible fallback and responsive sizing reference. */
+.hero--sculpture .hero__original { opacity: 0; }
+.hero--sculpture .hero__gl { z-index: 4; }
+.hero--sculpture .hero__artwork-stage { pointer-events: none; }
+.hero--sculpture.is-settled .hero__artwork-stage { z-index: 5; pointer-events: auto; touch-action: none; cursor: grab; user-select: none; }
+.hero--sculpture.is-settled .hero__artwork-stage.is-dragging { cursor: grabbing; }
+/* no rectangle around the logo while it is dragged or focused (also no mobile tap highlight) */
+.hero__artwork-stage, .hero__artwork-stage:focus, .hero__artwork-stage:focus-visible { outline: none; -webkit-tap-highlight-color: transparent; }
+
+.section { scroll-margin-top: 96px; }
+@media (prefers-reduced-motion: reduce) {
+  .hero[style*='--hero-exit'] .hero__gl, .hero[style*='--hero-exit'] .hero__canvas { transform: none; }
+  .section [data-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero--lite .hero__original { animation: artwork-fade .55s ease-out both; }
+}
+@keyframes artwork-fade { from { opacity: 0; } to { opacity: 1; } }

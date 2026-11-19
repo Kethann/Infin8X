@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://infin8x.pages.dev/sitemap.xml

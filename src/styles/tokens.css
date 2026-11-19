@@ -1,0 +1,45 @@
+/* Infin8X design tokens. Documented in docs/DESIGN.md. */
+:root {
+  --c-base: #0B0B10;
+  --c-void: #050508;
+  --c-surface: #14141C;
+  --c-text: #F5F5F7;
+  --c-muted: #A9A9BC;
+  --c-accent: #4D7CFF;
+  --s-red: #FF3B5C; --s-orange: #FF9A3C; --s-yellow: #FFD93C;
+  --s-green: #3CD98A; --s-blue: #3CA9FF; --s-violet: #7B5CFF;
+  --spectrum: linear-gradient(90deg, var(--s-red), var(--s-orange), var(--s-yellow), var(--s-green), var(--s-blue), var(--s-violet));
+  --spectrum-conic: conic-gradient(from 180deg, var(--s-red), var(--s-orange), var(--s-yellow), var(--s-green), var(--s-blue), var(--s-violet), var(--s-red));
+
+  /* glass */
+  --glass-bg: rgba(255,255,255,0.06);
+  --glass-bg-solid: rgba(20,20,28,0.92);   /* fallback without backdrop-filter / high contrast */
+  --glass-blur: 24px;
+  --glass-border: rgba(255,255,255,0.10);
+  --glass-hi: inset 0 1px 0 rgba(255,255,255,0.14);
+  --elev-1: 0 8px 30px -12px rgba(77,124,255,0.18);
+  --elev-2: 0 20px 60px -20px rgba(123,92,255,0.28);
+  --elev-3: 0 40px 120px -30px rgba(60,169,255,0.32);
+  --r-sm: 12px; --r-md: 20px; --r-lg: 28px;
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: Inter, system-ui, sans-serif;
+
+  /* type: fluid scale */
+  --fs-mono: clamp(0.75rem, 0.72rem + 0.15vw, 0.875rem);
+  --fs-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --fs-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
+  --fs-h3: clamp(1.25rem, 1.1rem + 0.7vw, 1.75rem);
+  --fs-h2: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
+  --fs-h1: clamp(2rem, 1.3rem + 3.4vw, 4.75rem);
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);      /* expo-out, entrances */
+  --ease-light: cubic-bezier(0.65, 0, 0.35, 1);   /* light travel */
+  --dur-1: 0.4s; --dur-2: 0.8s; --dur-3: 1.2s;
+
+  --gutter: clamp(20px, 4vw, 32px);
+  --section-accent: var(--c-accent);
+}
+@media (min-width: 768px) { :root { --gutter: 32px; } }
+@media (max-width: 767px) { :root { --glass-blur: 14px; } }

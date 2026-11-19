@@ -1,0 +1,20 @@
+INFIN8X animated logo
+
+INFIN8X-animated-logo.webp — 1000 × 440, transparent, 12-second looping animation.
+INFIN8X-animated-watermark.webp — 500 × 220, smaller website/watermark version.
+INFIN8X-animated-logo-poster.png — static fallback / reduced motion.
+INFIN8X-animation-preview.html — self-contained offline animation preview.
+
+Website example (copy both image assets to the same public folder):
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="/INFIN8X-animated-logo-poster.png">
+  <img src="/INFIN8X-animated-watermark.webp" alt="INFIN8X" width="500" height="220" style="width:150px;height:auto">
+</picture>
+
+White lettering reads best against a dark background. The image itself has no background.
+
+Additional requested versions:
+INFIN8X-animated-full-logo.gif — full logo and name, 800 × 352.
+INFIN8X-animated-text-only.gif — name only, 700 × 160.
+INFIN8X-animated-text-only.webp — name only with smooth alpha transparency.
+GIF supports binary transparency; WebP preserves smoother transparent edges.
