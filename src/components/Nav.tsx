@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { nav, navCta, brand } from '../content/site';
 import { chapters } from '../content/sections';
 import { BrandWordmark } from './BrandWordmark';
@@ -6,7 +6,11 @@ import { Icon } from './Icon';
 import { TransitionLink } from './PageTransition';
 import { useChapters, onProgress } from '../lib/chapters';
 
-/** Shared brand wordmark and chapter navigation, with a soft active-link highlight. */
+/**
+ * Shared brand wordmark and chapter navigation. Desktop: the wordmark on the left and one compact glass pill on the
+ * right: icon-only section buttons where the current section expands into a labelled capsule in its accent colour,
+ * a round "start a project" button and a round menu button. Phones: wordmark + menu button + the full sheet.
+ */
 export function Nav({ home }: { home: boolean }) {
   const [shown, setShown] = useState(!home);
   const [open, setOpen] = useState(false);
@@ -15,8 +19,6 @@ export function Nav({ home }: { home: boolean }) {
   const [inHero, setInHero] = useState(home);
   const { id: active, accent } = useChapters();
   const barRef = useRef<HTMLDivElement>(null);
-  const linksRef = useRef<HTMLElement>(null);
-  const [glider, setGlider] = useState<{ x: number; w: number } | null>(null);
 
   useEffect(() => {
     if (!home) { setShown(true); return; }
@@ -34,18 +36,6 @@ export function Nav({ home }: { home: boolean }) {
     setInHero((v) => (v === h ? v : h));
   }), [home]);
 
-  // the glider follows the active chapter link (re-measured when fonts load or the viewport changes)
-  useLayoutEffect(() => {
-    const measure = () => {
-      const el = linksRef.current?.querySelector<HTMLElement>(`[data-id="${active}"]`);
-      setGlider(el && el.offsetWidth ? { x: el.offsetLeft, w: el.offsetWidth } : null);
-    };
-    measure();
-    addEventListener('resize', measure);
-    document.fonts?.ready.then(measure);
-    return () => removeEventListener('resize', measure);
-  }, [active, shown]);
-
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
@@ -53,7 +43,6 @@ export function Nav({ home }: { home: boolean }) {
     const background = Array.from(document.querySelectorAll<HTMLElement>('#main, .footer'));
     const previousInert = background.map(el => el.inert);
     background.forEach(el => { el.inert = true; });
-    const closeOnDesktop = () => { if (window.innerWidth >= 1000) setOpen(false); };
     const escape = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
         const header = barRef.current?.closest('header');
@@ -64,9 +53,8 @@ export function Nav({ home }: { home: boolean }) {
       }
       if (event.key === 'Escape') { setOpen(false); barRef.current?.querySelector<HTMLButtonElement>('.nav__toggle')?.focus(); }
     };
-    window.addEventListener('resize', closeOnDesktop);
     window.addEventListener('keydown', escape);
-    return () => { document.body.style.overflow = previous; background.forEach((el, i) => { el.inert = previousInert[i]; }); window.removeEventListener('resize', closeOnDesktop); window.removeEventListener('keydown', escape); };
+    return () => { document.body.style.overflow = previous; background.forEach((el, i) => { el.inert = previousInert[i]; }); window.removeEventListener('keydown', escape); };
   }, [open]);
 
   const href = (h: string) => (home ? h : `/${h}`);
@@ -78,20 +66,20 @@ export function Nav({ home }: { home: boolean }) {
           <BrandWordmark />
         </TransitionLink>
 
-        <nav ref={linksRef} aria-label="Primary" className="nav__links">
-          <i className={`nav__glider ${glider ? 'is-on' : ''}`} aria-hidden="true"
-            style={glider ? { transform: `translateX(${glider.x}px)`, width: glider.w } : undefined} />
-          {nav.map((n) => (
-            <a key={n.href} data-id={n.id} href={href(n.href)} aria-current={active === n.id ? 'location' : undefined}>
-              <Icon name={n.id} size={15} /><span>{n.label}</span>
-            </a>
-          ))}
-        </nav>
-
-        <a className="nav__cta" href={href('#contact')}><span>{navCta}</span><Icon name="arrow" size={14} /></a>
-        <button type="button" className="nav__toggle" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>
-          <span className="sr-only">{open ? 'Close menu' : 'Open menu'}</span><i /><i />
-        </button>
+        <div className="nav__pill">
+          {/* --k: index of the current section (-1 when none); each button is placed by transform from it (no layout shift) */}
+          <nav aria-label="Primary" className="nav__links" style={{ '--k': nav.findIndex((n) => n.id === active) } as CSSProperties}>
+            {nav.map((n, i) => (
+              <a key={n.href} data-id={n.id} href={href(n.href)} title={n.label} aria-current={active === n.id ? 'location' : undefined} style={{ '--i': i } as CSSProperties}>
+                <Icon name={n.id} size={16} /><span>{n.label}</span>
+              </a>
+            ))}
+          </nav>
+          <a className="nav__cta" href={href('#contact')} title={navCta}><Icon name="contact" size={16} /><span className="nav__cta-label">{navCta}</span></a>
+          <button type="button" className="nav__toggle" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>
+            <span className="sr-only">{open ? 'Close menu' : 'Open menu'}</span><i /><i />
+          </button>
+        </div>
       </div>
 
       <div id="mobile-menu" className="nav__sheet" hidden={!open}>

@@ -1,53 +1,31 @@
 /* =====================================================================================================
    Chrome shared by every page: atmosphere, top bar, chapter headers, reveals, footer.
    Story: after the hero the light has dispersed; the page is the spectrum lobe. Each chapter takes the next
-   colour (red → violet) and the atmosphere, the nav glider and the nav timeline all follow it.
+   colour (red → violet) and the atmosphere, the nav capsule and the nav timeline all follow it.
    ===================================================================================================== */
-@property --amb  { syntax: '<color>'; inherits: true; initial-value: #3c6cff; }
-@property --amb2 { syntax: '<color>'; inherits: true; initial-value: #7b5cff; }
 
-/* ---------- atmosphere: soft colour clouds and an off-centre lens bloom ---------- */
-.ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; contain: strict;
-  transition: --amb 3.2s cubic-bezier(.4,0,.2,1), --amb2 3.8s cubic-bezier(.4,0,.2,1); }
-.ambient > i, .ambient__lens, .ambient__lens > i { position: absolute; display: block; }
-/* Broad, feathered stops avoid visible circles; a cool undertone connects the spectrum colours. */
-.ambient__nebula { inset: -12%; }
-.ambient__nebula--a {
-  background: radial-gradient(ellipse 58% 62% at 91% 24%, color-mix(in srgb, var(--amb) 28%, transparent), color-mix(in srgb, var(--amb) 12%, transparent) 32%, color-mix(in srgb, var(--amb) 3%, transparent) 62%, transparent 85%);
-  animation: amb-drift-a 42s ease-in-out infinite alternate; }
-.ambient__nebula--b {
-  background: radial-gradient(ellipse 65% 52% at 8% 80%, color-mix(in srgb, var(--amb2) 19%, transparent), color-mix(in srgb, var(--amb2) 7%, transparent) 42%, transparent 78%),
-    radial-gradient(ellipse 70% 65% at 60% 100%, rgba(42,57,118,.1), transparent 80%);
-  animation: amb-drift-b 54s ease-in-out infinite alternate; }
-@keyframes amb-drift-a { to { transform: translate3d(-3%, 4%, 0) scale(1.04); } }
-@keyframes amb-drift-b { to { transform: translate3d(4%, -3%, 0) scale(1.05); } }
-/* One soft light source: a diffuse core, a horizontal optical flare and a faint lens ghost.
-   The whole group moves together so the reflections never look like travelling UI dividers. */
-.ambient__lens { inset: 0; opacity: .8; animation: amb-lens 32s ease-in-out infinite alternate; }
-.ambient__bloom { left: 87%; top: 29%; width: clamp(280px, 46vw, 760px); aspect-ratio: 1; transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse, rgba(232,240,255,.17), color-mix(in srgb, var(--amb) 23%, transparent) 9%, color-mix(in srgb, var(--amb) 11%, transparent) 26%, color-mix(in srgb, var(--amb2) 4%, transparent) 48%, transparent 70%); }
-.ambient__flare { left: 87%; top: 29%; width: min(1000px, 92vw); height: 30px; transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse 50% 8%, rgba(237,245,255,.3), color-mix(in srgb, var(--amb) 24%, transparent) 18%, color-mix(in srgb, var(--amb) 5%, transparent) 52%, transparent 100%),
-    radial-gradient(ellipse 48% 48%, color-mix(in srgb, var(--amb) 15%, transparent), transparent 80%); }
-.ambient__ghost { left: 20%; top: 72%; width: clamp(160px, 25vw, 400px); aspect-ratio: 1; transform: translate(-50%, -50%); opacity: .6;
-  background: radial-gradient(circle, color-mix(in srgb, var(--amb2) 4%, transparent), transparent 46%, color-mix(in srgb, var(--amb2) 5%, transparent) 56%, color-mix(in srgb, var(--amb) 3%, transparent) 61%, transparent 71%); }
-@keyframes amb-lens { to { transform: translate3d(-2vw, 3vh, 0); opacity: .58; } }
-/* Keep the reading area dark while allowing colour to breathe around its edges. */
-.ambient__shade { inset: 0; background: radial-gradient(ellipse 58% 75% at 44% 45%, rgba(2,6,17,.28), transparent 85%), linear-gradient(180deg, rgba(2,6,17,.18), transparent 20%, transparent 80%, rgba(2,6,17,.2)); }
-.ambient__grain { inset: 0; opacity: .025;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-@media (max-width: 600px) {
-  .ambient__lens { opacity: .55; animation: none; }
-  .ambient__bloom, .ambient__flare { left: 105%; top: 25%; }
-  .ambient__ghost { display: none; }
-}
-.lowend .ambient__grain { display: none; }
-.lowend .ambient__nebula, .lowend .ambient__lens { animation: none; }
+/* ---------- atmosphere: light field (three/lightField.ts) behind every page; the hero covers it ---------- */
+.prismflow { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; display: block; pointer-events: none; opacity: 0;
+  background: #020611; }
+/* no WebGL / low-power: a still CSS version of the light (warm leak lower left, cool haze, dark field) */
+.prismflow--fallback { opacity: 1;
+  background:
+    radial-gradient(70% 55% at -5% 105%, rgba(255,100,20,.22), transparent 62%),
+    radial-gradient(60% 40% at 60% 20%, rgba(40,140,255,.08), transparent 70%),
+    linear-gradient(180deg, #010206 0%, #03060d 55%, #070b14 100%); }
 @media (prefers-reduced-motion: reduce) {
-  .ambient { transition: none; }
-  .ambient__nebula, .ambient__lens, .footer__spectrum, .section[data-chapter]::after { animation: none; }
+  .footer__spectrum, .section[data-chapter]::after { animation: none; }
 }
-@media (prefers-contrast: more) { .ambient { display: none; } }
+@media (prefers-contrast: more) { .prismflow { display: none; } }
+/* frosted glass between the background and the text: a slight dark tint and a soft blur, strongest through the reading
+   column and clearing toward the screen edges so the light field stays visible around the copy */
+.prismflow-veil { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(2,4,10,.34), rgba(2,4,10,.26) 50%, rgba(2,4,10,.34));
+  -webkit-backdrop-filter: blur(9px) saturate(1.15); backdrop-filter: blur(9px) saturate(1.15);
+  -webkit-mask-image: linear-gradient(90deg, rgba(0,0,0,.25), #000 22%, #000 78%, rgba(0,0,0,.25));
+          mask-image: linear-gradient(90deg, rgba(0,0,0,.25), #000 22%, #000 78%, rgba(0,0,0,.25)); }
+@media (max-width: 767px) { .prismflow-veil { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); -webkit-mask-image: none; mask-image: none; } }
+.lowend .prismflow-veil { -webkit-backdrop-filter: none; backdrop-filter: none; }
 
 /* ---------- top bar: shared wordmark and chapter navigation ---------- */
 .nav { position: fixed; inset: 0 0 auto; z-index: 50; opacity: 0; transform: translateY(-14px); pointer-events: none;
@@ -78,11 +56,6 @@
 .nav__links a:hover .icon { opacity: 1; transform: translateY(-1px); }
 .nav__links a[aria-current] { color: #fff; }
 .nav__links a[aria-current] .icon { opacity: 1; color: color-mix(in srgb, var(--nav-accent) 62%, #fff); }
-.nav__glider { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 11px; opacity: 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--nav-accent) 22%, rgba(255,255,255,.06)), color-mix(in srgb, var(--nav-accent) 8%, transparent));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), inset 0 0 0 1px color-mix(in srgb, var(--nav-accent) 35%, transparent), 0 6px 22px -8px color-mix(in srgb, var(--nav-accent) 70%, transparent);
-  transition: transform .7s var(--ease-out), width .7s var(--ease-out), opacity .4s, background 1.2s, box-shadow 1.2s; }
-.nav__glider.is-on { opacity: 1; }
 .nav__cta { display: none; align-items: center; gap: 10px; min-height: 42px; padding: 0 18px; border-radius: 13px; white-space: nowrap;
   font: 500 .875rem/1.2 'Space Grotesk', sans-serif; letter-spacing: .01em; color: #0b0f18;
   background: linear-gradient(165deg, #fff, #e6ecf5 60%, #cbd6e6); box-shadow: inset 0 1px 0 #fff, inset 0 -1px 1px rgba(79,99,129,.32), 0 4px 18px -6px color-mix(in srgb, var(--nav-accent) 60%, transparent);
@@ -90,6 +63,9 @@
 .nav__cta:hover { transform: translateY(-1px); }
 .nav__cta .icon { transition: transform .4s var(--ease-out); }
 .nav__cta:hover .icon { transform: translate(2px, -2px); }
+/* phones: the pill is only a wrapper, its children sit in the bar's grid as before */
+.nav__pill { display: contents; }
+.nav__cta-label { margin-left: 2px; }
 .nav__toggle { width: 44px; height: 44px; border-radius: 13px; display: grid; place-content: center; gap: 6px;
   background: linear-gradient(155deg, rgba(239,246,255,.1), rgba(221,235,255,.02)); box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 0 0 1px rgba(220,235,255,.1); }
 .nav__toggle i { display: block; width: 18px; height: 1.5px; background: var(--c-text); transition: transform .45s var(--ease-out); }
@@ -115,16 +91,51 @@
 @keyframes sheet-in { from { opacity: 0; transform: translateY(10px); filter: blur(6px); } }
 
 @media (min-width: 1000px) {
-  .nav__bar { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding-right: 7px; }
-  .nav__links { display: flex; }
-  .nav__toggle, .nav__sheet { display: none !important; }
-  .nav__cta { display: inline-flex; justify-self: end; }
+  /* the bar itself goes clear: the wordmark stands alone, the controls live in one compact glass pill */
+  .nav__bar, .nav.is-scrolled .nav__bar, .nav.is-open .nav__bar { grid-template-columns: minmax(0, 1fr) auto; padding: 4px 0 4px 8px; overflow: visible;
+    background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+  .nav__pill { display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 999px; justify-self: end;
+    background: linear-gradient(180deg, rgba(231,240,255,.09), rgba(255,255,255,.02) 50%, rgba(8,15,27,.12)), rgba(9,14,25,.66);
+    -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 0 0 1px rgba(221,234,255,.09), 0 16px 40px -18px rgba(0,0,0,.75),
+      0 0 50px -28px color-mix(in srgb, var(--nav-accent) 70%, transparent); }
+  /* buttons are placed by transform, not layout: the current one widens into a capsule (--cap) and the ones after it
+     slide right by the extra width. Constant row width; no layout shift while scrolling. With no current section (-1)
+     every button sits right-aligned. */
+  .nav__links { --slot: 44px; --cap: calc(55px + 6.9 * .6875rem); position: relative; display: block; height: 42px; padding: 0;
+    width: calc(4 * var(--slot) + var(--cap)); background: none; box-shadow: none; }
+  .nav__links a { position: absolute; left: 0; top: 0; display: flex; align-items: center; justify-content: center; gap: 0; width: 42px; height: 42px; padding: 0;
+    border-radius: 999px; box-sizing: border-box;
+    transform: translateX(calc(var(--i) * var(--slot) + clamp(0, var(--i) - var(--k), 1) * (var(--cap) - 42px)));
+    transition: color .35s, background .45s, box-shadow .45s, transform .55s var(--ease-out), width .55s var(--ease-out), padding .55s var(--ease-out); }
+  .nav__links a span { max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; margin-left: 0;
+    font: 600 .6875rem/1 'JetBrains Mono', monospace; letter-spacing: .16em; text-transform: uppercase;
+    transition: max-width .55s var(--ease-out), opacity .35s, margin .55s var(--ease-out); }
+  .nav__links a:hover:not([aria-current]) { background: rgba(255,255,255,.07); }
+  /* the current section: a lit capsule in its accent colour, with its name */
+  .nav__links a[aria-current] { width: var(--cap); justify-content: flex-start; padding: 0 0 0 14px; color: #fff;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--nav-accent) 78%, #fff 8%), color-mix(in srgb, var(--nav-accent) 58%, #05070d));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), inset 0 0 0 1px color-mix(in srgb, var(--nav-accent) 60%, #fff 10%),
+      0 8px 24px -8px color-mix(in srgb, var(--nav-accent) 80%, transparent); }
+  /* fixed label width: every capsule is the same size, so the pill never changes width as you scroll (no layout shift) */
+  .nav__links a[aria-current] span { max-width: 6.9em; width: 6.9em; opacity: 1; margin-left: 9px; text-align: left; }
+  .nav__links a[aria-current] .icon { color: #fff; }
+  .nav__cta, .nav__toggle { display: inline-grid; place-items: center; width: 42px; height: 42px; min-height: 0; padding: 0; border-radius: 999px; }
+  .nav__cta { color: #eef3fb; background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); transition: background .35s, transform .4s var(--ease-out); }
+  .nav__cta:hover { background: rgba(255,255,255,.12); }
+  .nav__cta:hover .icon { transform: translate(1px, -1px); }
+  .nav__cta-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .nav__toggle { gap: 5px; margin-left: 2px; box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 0 0 1px rgba(220,235,255,.2); }
+  .nav__toggle i { width: 16px; }
+  .nav.is-open .nav__toggle i:first-of-type { transform: translateY(3.25px) rotate(45deg); }
+  .nav.is-open .nav__toggle i:last-of-type { transform: translateY(-3.25px) rotate(-45deg); }
+  /* the menu sheet opens as a panel under the pill */
+  .nav__sheet { left: auto; width: min(380px, calc(100vw - 2 * var(--gutter))); background-color: rgba(8,12,22,.96); }
 }
-@media (min-width: 1000px) and (max-width: 1120px) { .nav__links a { padding-inline: 10px; } .nav__links a .icon { display: none; } }
 .lowend .nav__bar, .lowend .nav__sheet { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: rgba(10,15,26,.95); }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nav__bar, .nav__sheet { background-color: #0d1422; } }
 @media (prefers-contrast: more) { .nav__bar, .nav__sheet { background: #0d1422 !important; backdrop-filter: none; box-shadow: inset 0 0 0 1px #bcc8d9; } .nav__links a { color: #f5f5f7; } }
-@media (prefers-reduced-motion: reduce) { .nav__glider, .nav__brand, .nav__sheet li, .nav__sheet-cta { transition: none; animation: none; } }
+@media (prefers-reduced-motion: reduce) { .nav__links a, .nav__links a span, .nav__brand, .nav__sheet li, .nav__sheet-cta { transition: none; animation: none; } }
 
 /* ---------- chapter headers ---------- */
 .section[data-chapter] { scroll-margin-top: 0; isolation: isolate; overflow-x: clip; }
@@ -143,9 +154,10 @@
   overflow-wrap: anywhere; pointer-events: none; user-select: none;
   font: 500 clamp(2.75rem, 9vw, 6.5rem)/.95 'Unbounded', sans-serif; letter-spacing: -.04em;
   /* the fade lives in the colours (not `opacity`), so the reveal's opacity: 1 can never brighten it */
-  background: linear-gradient(180deg, color-mix(in srgb, color-mix(in srgb, var(--section-accent) 45%, #c8d2e6) 30%, transparent) 0%, color-mix(in srgb, var(--section-accent) 9%, transparent) 50%, transparent 96%);
+  /* strong enough to read over a lit background: light accent-tinted top, fading to a faint base */
+  background: linear-gradient(180deg, color-mix(in srgb, color-mix(in srgb, var(--section-accent) 35%, #e4ebf7) 78%, transparent) 0%, color-mix(in srgb, color-mix(in srgb, var(--section-accent) 55%, #c8d2e6) 42%, transparent) 55%, color-mix(in srgb, var(--section-accent) 12%, transparent) 100%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
-  -webkit-mask-image: linear-gradient(90deg, #000 35%, rgba(0,0,0,.35) 100%); mask-image: linear-gradient(90deg, #000 35%, rgba(0,0,0,.35) 100%); }
+  -webkit-mask-image: linear-gradient(90deg, #000 45%, rgba(0,0,0,.6) 100%); mask-image: linear-gradient(90deg, #000 45%, rgba(0,0,0,.6) 100%); }
 .chapter--center .chapter__ghost { margin-inline: auto; -webkit-mask-image: none; mask-image: none; }
 @media (prefers-contrast: more) { .chapter__ghost { background: none; color: #bcc8d9; } }
 

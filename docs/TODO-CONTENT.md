@@ -33,7 +33,6 @@ For each of Kaaya Cafe, Dolly Design Studio, Delivery robot (SN15), and Amuse:
 
 ## Added in the page redesign
 - [ ] `skills.ts`: tools copied from kethan.pages.dev without a note there (Streamlit, Render, Netlify, MySQL, Cloudflare R2, ipstack, DevOps & tools, AI tools, Python libraries, RViz, Inference, Validation, Datasets) have short notes written for this site — review
-- [ ] `sections.ts → about.journey`: the last milestone ("Now") was reworded for the tech studio — confirm
 
 ## Site refinement
 - Contact displays **Kethan Artzz** and links to the existing LinkedIn profile until the studio email is supplied.

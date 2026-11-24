@@ -9,7 +9,7 @@ import { DebugOverlay } from './pages/DebugOverlay';
 import { Nav } from './components/Nav';
 import { Footer } from './components/Footer';
 import { Wipe } from './components/PageTransition';
-import { Ambient } from './components/Ambient';
+import { PrismFlow } from './components/PrismFlow';
 import { trackChapters } from './lib/chapters';
 import { useReducedMotion } from './lib/useReducedMotion';
 import { hasDebug, isTouch, isLowEnd } from './lib/env';
@@ -140,7 +140,7 @@ export function App() {
   return (
     <>
       <a className="skip-link" href="#main">Skip to content</a>
-      <Ambient />
+      <PrismFlow home={home} />
       <Nav home={home} />
       <main id="main" tabIndex={-1}>
         <Switch>

@@ -17,7 +17,7 @@ export function ProgressBeam() {
     let triggers: ScrollTrigger[] = [];
     const bind = () => {
       triggers.forEach((t) => t.kill());
-      triggers = gsap.utils.toArray<HTMLElement>('[data-accent]').map((sec) => ScrollTrigger.create({
+      triggers = gsap.utils.toArray<HTMLElement>('[data-chapter]').map((sec) => ScrollTrigger.create({
         trigger: sec, start: 'top 55%', end: 'bottom 55%',
         onToggle: (s) => { if (s.isActive) el.style.setProperty('--head', getComputedStyle(sec).getPropertyValue('--section-accent')); },
       }));

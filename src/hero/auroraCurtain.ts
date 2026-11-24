@@ -127,6 +127,52 @@ vec3 fan(vec2 q, float L, float t){
            * (1.0 - smoothstep(0.9, 1.0, ab));   // fully consumed trails cannot return
 }
 
+// Prismatic shards (reference: crystal light leaks): soft elongated slivers with a white core and the spectrum
+// along their length, streaking in from both edges on the shared energy clock, stretching as they accelerate and
+// absorbed at the crossing. They live in the aurora → rush window and fade out as the trace begins.
+vec3 specRamp(float x){
+  vec3 c = clamp(abs(mod(clamp(x, 0.0, 1.0) * 4.6 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+  return c * c * (3.0 - 2.0 * c);
+}
+vec3 shards(vec2 a, float t){
+  float env = smoothstep(0.08, 0.5, uLevel) * (1.0 - smoothstep(0.0, 0.3, uTrace)) * (1.0 + uRush * 0.8);
+  if (env < 0.002) return vec3(0.0);
+  vec3 c = vec3(0.0);
+#ifdef AURORA_LITE
+  const int N = 12;
+#else
+  const int N = 26;
+#endif
+  for (int i = 0; i < N; i++){
+    float fi = float(i);
+    float side = step(0.5, h11(fi * 3.7 + 1.0));                    // 1 = spectrum (right) lobe
+    float rate = mix(0.09, 0.17, h11(fi * 5.1 + 2.0));
+    float life = fract(uFlow * rate + h11(fi * 7.3 + 4.0));
+    float acc = pow(life, 1.7);                                     // accelerates into the core
+    float ang = mix(3.14159265, 0.0, side) + (h11(fi * 9.9 + 6.0) - 0.5) * 2.4 + 0.04 * sin(t * 0.2 + fi);
+    vec2 dir = vec2(cos(ang), sin(ang) * 0.9);
+    float R0 = uAspect * 0.55 * mix(0.85, 1.15, h11(fi * 2.3 + 8.0));
+    float rr = R0 * (1.0 - acc);
+    vec2 ctr = dir * rr;
+    // slight sweep so paths flatten toward the crossing like the fibres
+    ctr.y *= mix(0.55, 1.0, rr / R0);
+    vec2 mv = normalize(dir * vec2(1.0, mix(0.55, 1.0, rr / R0)));
+    vec2 d = a - ctr;
+    float along = dot(d, mv), across = dot(d, vec2(-mv.y, mv.x));
+    float speed = 1.7 * pow(max(life, 0.02), 0.7);
+    float blur = h11(fi * 4.1 + 3.0);                               // some are far out of focus
+    float L = mix(0.03, 0.075, h11(fi * 6.7)) * (0.6 + speed * 0.9) * mix(1.0, 1.5, blur);
+    float W = mix(0.006, 0.011, h11(fi * 8.2)) * mix(1.0, 3.0, blur * blur);
+    float e = exp(-(along * along) / (L * L) - (across * across) / (W * W));
+    float fade = smoothstep(0.0, 0.18, life) * smoothstep(0.0, 0.1, rr);   // absorbed, never cut
+    vec3 sideTint = mix(vec3(0.55, 0.75, 1.0), vivid(logoPalette(h11(fi * 1.9) * 1.4)), side);
+    vec3 sc = mix(specRamp(0.5 + along / L * 0.6 + (h11(fi * 3.3) - 0.5) * 0.25), sideTint, 0.35);
+    sc = mix(sc, vec3(1.0), exp(-(across * across) / (W * W * 0.12)) * 0.45 * (1.0 - blur));
+    c += sc * e * fade * mix(1.0, 0.3, blur) * mix(0.55, 1.0, h11(fi * 5.5));
+  }
+  return c * env * 1.25;
+}
+
 vec3 scene(vec2 p, float t){
   vec2 q = p - uLogo;
   vec2 absorption = p - uAbsorb;
@@ -142,6 +188,7 @@ vec3 scene(vec2 p, float t){
   float star = smoothstep(0.09, 0.0, sd) * step(0.982, sh) * (0.45 + 0.55 * sin(t * (1.0 + sh * 3.0) + sh * 80.0));
   c += mix(vec3(0.6, 0.8, 1.0), vec3(1.0, 0.7, 0.85), step(0.0, q.x)) * star * 0.4 * sky * uLevel;
   // Incoming energy is absorbed at the core. The surface carries it to formation.
+  c += shards(absorption, t);
   c += fan(absorption, 0.0, t);
   c += fan(absorption * vec2(1.0, 1.04), 0.5, t);
 #ifndef AURORA_LITE

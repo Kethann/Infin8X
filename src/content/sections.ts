@@ -32,15 +32,6 @@ export const about = {
     'Refine the details that make a product easier to use.',
   ],
   principleLabels: ['Idea', 'Craft', 'Detail'],
-  /** milestone track, from the owner's own site (technical milestones only) */
-  since: '2021',
-  sinceLabel: 'Building since',
-  journey: [
-    { name: 'UI / UX design', text: 'Interfaces, flows & design systems' },
-    { name: 'Full-stack & apps', text: 'React, Node, cloud & APIs' },
-    { name: 'Robotics & AI', text: 'ROS, Arduino, sensors, vision models' },
-    { name: 'Now', text: 'Websites and apps, from concept to launch' },
-  ],
   body: 'We plan, design and build websites, apps and digital tools, with every decision shaped by your goals and the people using them.',
   accent: 'red' as Accent,
 };
@@ -77,17 +68,6 @@ export const processSteps = {
   eyebrow: 'Process',
   title: 'From idea to launch.',
   lead: 'Six steps, with working previews and space for your feedback.',
-  replay: 'Replay',
-  stage: { idea: 'Idea', prism: 'Understanding', build: 'Plan & build', loop: 'Feedback', live: 'Live' },
-  /** the key that explains the prism metaphor, shown above the diagram */
-  legendTitle: 'How to read the light',
-  legend: [
-    { kind: 'white', term: 'White light', meaning: 'your idea' },
-    { kind: 'prism', term: 'The prism', meaning: 'we understand it' },
-    { kind: 'spectrum', term: 'The colours', meaning: 'design, code and content, in parallel' },
-    { kind: 'loop', term: 'The loop', meaning: 'your feedback' },
-    { kind: 'point', term: 'One point', meaning: 'live' },
-  ],
   deliverableLabel: 'Deliverable',
   timeLabel: 'Typical time',
   accent: 'yellow' as Accent,
