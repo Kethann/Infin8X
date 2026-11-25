@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from PIL import Image
 root = Path(__file__).resolve().parents[1]
-im = np.asarray(Image.open(root / 'Gemini_Generated_Image_xpnpsnxpnpsnxpnp.png').convert('RGB'))
+im = np.asarray(Image.open(root / 'source-assets/logo/logo-source-render.png').convert('RGB'))
 bright = im.max(axis=2)
 _, labels, stats, _ = cv2.connectedComponentsWithStats((bright > 45).astype(np.uint8))
 ids = [i for i, (x,y,w,h,a) in enumerate(stats) if i and y < 850 and a > 1000]

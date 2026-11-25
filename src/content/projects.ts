@@ -9,6 +9,9 @@ export interface Project {
   summary: string;
   tags: string[];
   cover: string;            // image path or '' for generated spectrum cover
+  /** the same site captured at phone (390×844) and tablet (834×1112) sizes: the Work split screen shows the one that fits */
+  coverMobile?: string;
+  coverTablet?: string;
   status: '[CONFIRM public / permission]';
   idea: string;
   delivered: string;
@@ -31,17 +34,18 @@ export const projects: Project[] = [
     idea: 'Let guests scan a QR code at the table and order straight from their phone.',
     delivered: '[PLACEHOLDER: delivered result]',
     timeline: tl('Scan, browse, order: no app install.', 'Mobile-first menu and ordering flow.', '[PLACEHOLDER: launch details]') },
-  { summary: 'A studio website that brings its portfolio and visual identity together.', slug: 'dolly-design-studio', name: 'Dolly', discipline: 'Studio website', title: 'Dolly Design Studio website', category: 'Web', accent: 'red',
-    outcome: '[PLACEHOLDER: outcome]', tags: ['Web design', 'Portfolio', 'SEO'], cover: '', status: '[CONFIRM public / permission]',
-    idea: '[PLACEHOLDER: client idea]', delivered: '[PLACEHOLDER: delivered result]',
-    timeline: tl('[PLACEHOLDER]', '[PLACEHOLDER]', '[PLACEHOLDER]') },
-  { summary: 'An indoor delivery exploration using robot navigation, mapping and computer vision.', slug: 'delivery-robot-sn15', name: 'SN15', discipline: 'Robot navigation', title: 'Delivery robot navigation (SN15)', category: 'AI & Robotics', accent: 'violet',
-    outcome: '[PLACEHOLDER: outcome, e.g. autonomous indoor navigation]', tags: ['ROS 2', 'Navigation', 'Computer vision'], cover: '', status: '[CONFIRM public / permission]',
-    idea: 'A robot that can find its own way to deliver items indoors.', delivered: '[PLACEHOLDER: delivered result]',
-    timeline: tl('Autonomous delivery indoors.', 'Mapping, localisation and path planning on ROS 2.', '[PLACEHOLDER]') },
-  { summary: 'A portfolio concept that brings creative work, typography and motion together.', slug: 'amuse-portfolio', name: 'Amuse', discipline: 'Creative portfolio', title: 'Amuse portfolio', category: 'Web', accent: 'blue',
-    outcome: '[PLACEHOLDER: outcome]', tags: ['Portfolio', 'Motion'], cover: '', status: '[CONFIRM public / permission]',
-    idea: '[PLACEHOLDER]', delivered: '[PLACEHOLDER]', timeline: tl('[PLACEHOLDER]', '[PLACEHOLDER]', '[PLACEHOLDER]') },
+  { summary: 'The website for Dolly Design Studio, a film poster and title design studio.', slug: 'dolly-design-studio', name: 'Dolly', discipline: 'Studio website', title: 'Dolly Design Studio website', category: 'Web', accent: 'red',
+    outcome: '[PLACEHOLDER: outcome]', tags: ['Web design', 'Portfolio', 'SEO'], cover: '/work/dolly.webp', coverMobile: '/work/dolly-mobile.webp', coverTablet: '/work/dolly-tablet.webp', status: '[CONFIRM public / permission]',
+    idea: 'Present a film publicity studio’s posters, title design, typography and logos.', delivered: '[PLACEHOLDER: delivered result]',
+    timeline: tl('[PLACEHOLDER]', '[PLACEHOLDER]', '[PLACEHOLDER]'), url: 'https://dollydstudio.pages.dev/' },
+  { summary: 'The website for UniCre8, a digital marketing, content and web studio.', slug: 'unicre8', name: 'UC8', discipline: 'Studio website', title: 'UniCre8 studio website', category: 'Web', accent: 'orange',
+    outcome: '[PLACEHOLDER: outcome]', tags: ['Web design', 'Development', 'Motion'], cover: '/work/uc8.webp', coverMobile: '/work/uc8-mobile.webp', coverTablet: '/work/uc8-tablet.webp', status: '[CONFIRM public / permission]',
+    idea: 'One site for a studio that handles marketing, content and web in one place.', delivered: '[PLACEHOLDER: delivered result]',
+    timeline: tl('[PLACEHOLDER]', '[PLACEHOLDER]', '[PLACEHOLDER]'), url: 'https://uc8.vercel.app/' },
+  { summary: 'Kethan’s own portfolio, where design, engineering and robotics work sit together.', slug: 'ka', name: 'KA', discipline: 'Personal portfolio', title: 'KA portfolio', category: 'Web', accent: 'red',
+    outcome: '[PLACEHOLDER: outcome]', tags: ['Portfolio', 'Motion', 'Development'], cover: '/work/kethan.webp', coverMobile: '/work/kethan-mobile.webp', coverTablet: '/work/kethan-tablet.webp', status: '[CONFIRM public / permission]',
+    idea: 'One home for graphic design, UI/UX, full-stack and robotics work.', delivered: '[PLACEHOLDER: delivered result]',
+    timeline: tl('[PLACEHOLDER]', '[PLACEHOLDER]', '[PLACEHOLDER]'), url: 'https://kethan.pages.dev/' },
 ];
 
-export const categories = ['All', 'Web', 'App', 'AI & Robotics'] as const;
+export const categories = ['All', 'Web', 'App'] as const;

@@ -1,13 +1,14 @@
 import { useLocation } from 'wouter';
 import { brand } from '../content/site';
-import { chapters, footer } from '../content/sections';
+import { footer } from '../content/sections';
 import { prefersReducedMotion } from '../lib/env';
 import { Words } from './Chapter';
 import { BrandWordmark } from './BrandWordmark';
 import { TransitionLink } from './PageTransition';
 import { Icon } from './Icon';
 
-/** The finale: the light that crossed the page lands as one line, the closing promise and the way back. */
+/** The finale: the closing line and call to action, then one bar (brand left, LinkedIn and back-to-top right) and the base line.
+ *  Section links live only in the top nav. */
 export function Footer() {
   const [loc] = useLocation();
   const href = (h: string) => (loc === '/' ? h : `/${h}`);
@@ -28,15 +29,15 @@ export function Footer() {
             <TransitionLink to="/" className="footer__home" aria-label={`${brand.name} home`}><BrandWordmark /></TransitionLink>
             <p>{brand.reading}</p>
           </div>
-          <nav aria-label="Footer" className="footer__nav">
-            {chapters.map((c) => <a key={c.id} href={href(`#${c.id}`)}>{c.label}</a>)}
-          </nav>
           <div className="footer__links">
             <a href={brand.links.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <Icon name="arrow" size={13} /></a>
             <button type="button" onClick={backToTop}>{footer.top} <Icon name="up" size={13} /></button>
           </div>
         </div>
-        <p className="footer__copyright">© {new Date().getFullYear()} {brand.name}. {brand.coreLine}</p>
+        <div className="footer__base">
+          <p className="footer__copyright">© {new Date().getFullYear()} {brand.name}</p>
+          <p className="footer__core">{brand.coreLine}</p>
+        </div>
       </div>
     </footer>
   );

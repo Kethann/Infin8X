@@ -2,7 +2,7 @@
 export const brand = {
   name: 'Infin8X',
   reading: 'Infinite Experience',
-  coreLine: 'Turning ideas into digital reality.',
+  coreLine: 'Turning ideas into digital reality',
   secondaryLine: 'Every pixel matters.',
   servicesLine: 'Websites, apps, AI and motion.',
   projectCta: 'Start a project',

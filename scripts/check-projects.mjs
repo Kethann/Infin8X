@@ -23,7 +23,7 @@ try {
    if(await button.getAttribute('aria-expanded')==='false')await button.click();
    await settle();
    assert.equal(await page.locator('.work-entry__toggle[aria-expanded="true"]').count(),1);
-   assert.equal(await page.getByRole('region',{name:/Kaaya|Dolly|SN15|Amuse/}).count(),1);
+   assert.equal(await page.getByRole('region',{name:/Kaaya|Dolly|UC8|KA/}).count(),1);
    assert.equal(await page.locator('.work-entry__link[tabindex="0"]').count(),1);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
    const image=await rows.nth(i).locator('.project-study__scene').boundingBox();

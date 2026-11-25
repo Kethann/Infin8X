@@ -18,7 +18,7 @@ The spectrum is a *reward*: it appears at moments of interaction and progress, a
 **Section accents:** About red · Services orange · Process yellow · Projects green · Skills blue · Contact violet.
 The navigation highlight and page atmosphere follow the active section. The top-bar checkpoint strip has been removed.
 
-**Type:** Space Grotesk 500 for headings, buttons and navigation (`--font-display`); Inter for body (`--font-body`); JetBrains Mono for small chapter labels. Unbounded remains in decorative chapter numerals. The custom wordmark uses Turbo Driver and Ariovex with the infinity symbol, shared by the hero, navigation and footer.
+**Type:** Headlines Deluxe (caps, condensed) for headings, buttons and navigation (`--font-display`) and, in Italic, for the large faded section names; Unique for body copy and forms (`--font-body`); Headlines Deluxe letter-spaced for small labels (`--font-label`); Epstonik (`ss03`, the flourished X) for the "Infinite Experience" reading only (`--font-accent`). Space Grotesk / Inter / JetBrains Mono remain as fallbacks. The custom wordmark uses Turbo Driver and Ariovex with the infinity symbol, shared by the hero, navigation and footer.
 The fluid scale is `--fs-mono … --fs-h1`, all built with `clamp()`.
 
 ## 3. Glass
@@ -55,7 +55,7 @@ Removed on purpose (they read as decoration): code rain/terminals, comets, beam 
 ghost outlines, blueprint line, colour washes, drag hint.
 
 ## 6. Components
-`Glass`, `SectionHeader`, `Mark` (flat logo), `Nav`, `ProgressBeam`, `Cursor`, `TransitionLink`/`Wipe`, `Footer`, `LogoPath`
+`Chapter` (section header), `Mark` (flat logo), `Nav`, `TransitionLink`/`Wipe`, `Footer`, `LogoPath`
 (SVG centreline, `variant="full|split"`) and `useLightTravel()` (stroke-dash light along any `<path>`, scroll-scrubbed or played once).
 
 ## Responsive refinement

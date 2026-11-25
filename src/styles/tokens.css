@@ -7,9 +7,9 @@
   --c-muted: #A9A9BC;
   --c-accent: #4D7CFF;
   --s-red: #FF3B5C; --s-orange: #FF9A3C; --s-yellow: #FFD93C;
-  --s-green: #3CD98A; --s-blue: #3CA9FF; --s-violet: #7B5CFF;
-  --spectrum: linear-gradient(90deg, var(--s-red), var(--s-orange), var(--s-yellow), var(--s-green), var(--s-blue), var(--s-violet));
-  --spectrum-conic: conic-gradient(from 180deg, var(--s-red), var(--s-orange), var(--s-yellow), var(--s-green), var(--s-blue), var(--s-violet), var(--s-red));
+  --s-magenta: #D94CFF; --s-blue: #3CA9FF; --s-violet: #7B5CFF;
+  --spectrum: linear-gradient(90deg, var(--s-red), var(--s-orange), var(--s-yellow), var(--s-magenta), var(--s-blue), var(--s-violet));
+  --spectrum-conic: conic-gradient(from 180deg, var(--s-red), var(--s-orange), var(--s-yellow), var(--s-magenta), var(--s-blue), var(--s-violet), var(--s-red));
 
   /* glass */
   --glass-bg: rgba(255,255,255,0.06);
@@ -22,15 +22,23 @@
   --elev-3: 0 40px 120px -30px rgba(60,169,255,0.32);
   --r-sm: 12px; --r-md: 20px; --r-lg: 28px;
 
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: Inter, system-ui, sans-serif;
+  /* Brand type (woff2 subsets in public/fonts, sources in FONTS2/ and fonts/). The Infin8X wordmark keeps Ariovex +
+     Turbo Driver, "Infinite Experience" keeps Epstonik, the hero's .hero__wm keeps Unbounded: never restyle those. */
+  --font-display: 'Baserona', 'Space Grotesk', system-ui, sans-serif;            /* wide geometric caps: headings, buttons, nav */
+  --font-body: 'Unique', Inter, system-ui, sans-serif;                          /* paragraphs, UI copy, form fields */
+  --font-name: 'Bricolage Grotesque Variable', 'Manrope Variable', system-ui, sans-serif; /* project names, About principles: characterful, easy to read big */
+  --font-read: 'Manrope Variable', Inter, system-ui, sans-serif;                 /* section descriptions: open, highly legible at small sizes */
+  --font-label: 'Biscora', 'Space Grotesk', system-ui, sans-serif;              /* condensed caps: small tracked labels, tags */
+  --font-figure: 'Biscora', 'Space Grotesk', system-ui, sans-serif;             /* condensed caps set big: project names, stats */
+  --font-ghost: 'Esthoria', 'Baserona', Georgia, serif;                         /* serif italic: the faded section names only (letters only) */
+  --font-accent: 'Epstonik', 'Unique', system-ui, sans-serif;                   /* the "Infinite Experience" reading only */
 
   /* type: fluid scale */
   --fs-mono: clamp(0.75rem, 0.72rem + 0.15vw, 0.875rem);
   --fs-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
-  --fs-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.375rem);
+  --fs-lead: clamp(1rem, .95rem + .3vw, 1.1875rem);
   --fs-h3: clamp(1.25rem, 1.1rem + 0.7vw, 1.75rem);
-  --fs-h2: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
+  --fs-h2: clamp(1.5rem, 1.1rem + 1.6vw, 2.5rem);
   --fs-h1: clamp(2rem, 1.3rem + 3.4vw, 4.75rem);
 
   /* motion */

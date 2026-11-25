@@ -26,6 +26,7 @@ varying vec2 vUv;
 uniform float uTime, uFlow, uAspect, uLevel, uHorizon, uRush, uFlash, uCalm, uTrace;
 uniform float uWaterSpread, uWaterMotion;
 uniform vec2 uLogo, uLogoSize, uAbsorb, uFormation;
+uniform vec3 uSun;   // x: -1 (sunrise, left) … 1 (sunset, right); y: elevation 0…1; z: day 0 (night) … 1
 uniform sampler2D uReflection;
 
 float h11(float n){ return fract(sin(n * 127.1) * 43758.5453); }
@@ -135,6 +136,7 @@ vec3 specRamp(float x){
   return c * c * (3.0 - 2.0 * c);
 }
 vec3 shards(vec2 a, float t){
+  // only while the energy is being absorbed: they fade out completely as the trace begins
   float env = smoothstep(0.08, 0.5, uLevel) * (1.0 - smoothstep(0.0, 0.3, uTrace)) * (1.0 + uRush * 0.8);
   if (env < 0.002) return vec3(0.0);
   vec3 c = vec3(0.0);
@@ -146,7 +148,7 @@ vec3 shards(vec2 a, float t){
   for (int i = 0; i < N; i++){
     float fi = float(i);
     float side = step(0.5, h11(fi * 3.7 + 1.0));                    // 1 = spectrum (right) lobe
-    float rate = mix(0.09, 0.17, h11(fi * 5.1 + 2.0));
+    float rate = mix(0.045, 0.1, h11(fi * 5.1 + 2.0));          // slow, each on its own rhythm
     float life = fract(uFlow * rate + h11(fi * 7.3 + 4.0));
     float acc = pow(life, 1.7);                                     // accelerates into the core
     float ang = mix(3.14159265, 0.0, side) + (h11(fi * 9.9 + 6.0) - 0.5) * 2.4 + 0.04 * sin(t * 0.2 + fi);
@@ -164,13 +166,36 @@ vec3 shards(vec2 a, float t){
     float L = mix(0.03, 0.075, h11(fi * 6.7)) * (0.6 + speed * 0.9) * mix(1.0, 1.5, blur);
     float W = mix(0.006, 0.011, h11(fi * 8.2)) * mix(1.0, 3.0, blur * blur);
     float e = exp(-(along * along) / (L * L) - (across * across) / (W * W));
-    float fade = smoothstep(0.0, 0.18, life) * smoothstep(0.0, 0.1, rr);   // absorbed, never cut
+    // absorbed at a random distance from the crossing (dissolves, never cut)
+    float fade = smoothstep(0.0, 0.18, life) * smoothstep(0.0, mix(0.05, 0.26, h11(fi * 6.1 + 9.0)), rr);
     vec3 sideTint = mix(vec3(0.55, 0.75, 1.0), vivid(logoPalette(h11(fi * 1.9) * 1.4)), side);
     vec3 sc = mix(specRamp(0.5 + along / L * 0.6 + (h11(fi * 3.3) - 0.5) * 0.25), sideTint, 0.35);
     sc = mix(sc, vec3(1.0), exp(-(across * across) / (W * W * 0.12)) * 0.45 * (1.0 - blur));
     c += sc * e * fade * mix(1.0, 0.3, blur) * mix(0.55, 1.0, h11(fi * 5.5));
   }
   return c * env * 1.25;
+}
+
+// Drifting dust (the bokeh of the other pages): sparse soft discs, blue and gold, one disc per grid cell so the cost
+// is constant per pixel. Two depths: small and sharp far away, larger and softer nearer.
+vec3 dustLayer(vec2 p, float t, float scale, float seed, float soft){
+  vec2 g = p * scale + vec2(t * 0.05, sin(t * 0.07 + seed) * 0.4) + seed * 13.1;
+  vec2 id = floor(g), f = fract(g) - 0.5;
+  float h = h21(id + seed);
+  if (h < 0.72) return vec3(0.0);                                      // most cells are empty
+  vec2 o = (vec2(h21(id + 3.1 + seed), h21(id + 7.7 + seed)) - 0.5) * 0.5 + 0.08 * vec2(sin(t * 0.3 + h * 40.0), cos(t * 0.23 + h * 30.0));
+  float r = mix(0.06, 0.16, h21(id + 11.3)) * soft;
+  float d = length(f - o);
+  float disc = smoothstep(r, r * 0.35, d) * (0.55 + 0.45 * sin(t * (0.4 + h) + h * 60.0));
+  vec3 col = mix(vec3(0.45, 0.62, 1.0), vec3(1.0, 0.78, 0.46), step(0.86, h));
+  return col * disc;
+}
+vec3 dust(vec2 p, float t){
+  vec3 c = dustLayer(p, t, 9.0, 1.7, 1.0) * 0.16;
+#ifndef AURORA_LITE
+  c += dustLayer(p, t * 0.7, 4.5, 4.3, 1.6) * 0.09;
+#endif
+  return c;
 }
 
 vec3 scene(vec2 p, float t){
@@ -182,7 +207,15 @@ vec3 scene(vec2 p, float t){
   // Deep sky: nebula wash (blue left, magenta right) and stars, strongest above the mark.
   float sky = smoothstep(uHorizon - 0.05, 0.45, p.y);
   float neb = n2(p * 2.6 + vec2(t * 0.01, 0.0)) * 0.6 + n2(p * 6.3 - vec2(0.0, t * 0.012)) * 0.4;
-  c += mix(vec3(0.08, 0.16, 0.85), vec3(0.75, 0.1, 0.45), smoothstep(-0.5, 0.5, q.x)) * pow(neb, 3.0) * 0.22 * sky * uLevel;
+  // the warm side of the wash follows the clock's light (left in the morning, right in the evening)
+  float sunX = uSun.x * uAspect * 0.42;
+  c += mix(vec3(0.08, 0.16, 0.85), vec3(0.75, 0.1, 0.45), smoothstep(-0.6, 0.6, p.x - sunX + 0.25)) * pow(neb, 3.0) * 0.22 * sky * uLevel;
+  // the pink light at the top: rises left, crosses high at noon, sets right; warmer when low, a dim violet moon at night
+  vec2 sunP = vec2(sunX, 0.36 + uSun.y * 0.1);
+  vec3 sunCol = mix(vec3(0.32, 0.22, 0.85), mix(vec3(1.0, 0.36, 0.5), vec3(0.95, 0.42, 0.72), smoothstep(0.2, 0.8, uSun.y)), uSun.z);
+  float glow = exp(-length((p - sunP) * vec2(0.75, 1.5)) * 2.4);
+  c += sunCol * glow * mix(0.07, 0.16, uSun.z) * sky * uLevel;
+  c += dust(p, t) * smoothstep(0.2, 0.8, uLevel);
   vec2 sg = p * 90.0, sid = floor(sg);
   float sh = h21(sid), sd = length(fract(sg) - 0.5 - (vec2(h21(sid + 2.3), h21(sid + 5.9)) - 0.5) * 0.6);
   float star = smoothstep(0.09, 0.0, sd) * step(0.982, sh) * (0.45 + 0.55 * sin(t * (1.0 + sh * 3.0) + sh * 80.0));
@@ -333,18 +366,35 @@ export interface AuroraCurtain {
   formation(x: number, y: number): void;
   water(spread: number, motion: number): void;
   update(seconds: number, flow: number, s: { aurora: number; rush: number; flash: number; calm: number; trace: number }): void;
+  /** Draw the backdrop: computed at reduced resolution (it is all soft light) and scaled up, then blended over the canvas. */
+  draw(renderer: THREE.WebGLRenderer): void;
   dispose(): void;
+}
+
+/** Same rule as the site background's `clockLight` (three/lightField.ts): sunrise left → sunset right, moon at night. */
+function hourNow(): number {
+  const q = Number(new URLSearchParams(location.search).get('hour'));
+  const d = new Date();
+  return Number.isFinite(q) && new URLSearchParams(location.search).has('hour') ? q : d.getHours() + d.getMinutes() / 60;
+}
+function sunFor(hour: number, t: number) {
+  const phase = (hour - 6) / 12;
+  const sunY = Math.sin(Math.PI * phase);
+  const x = Math.max(-1, Math.min(1, -Math.cos(Math.PI * phase) + 0.12 * Math.sin(t * 0.045)));
+  const elev = Math.abs(sunY) * (sunY > 0 ? 1 : 0.7);
+  const day = THREE.MathUtils.smoothstep(sunY, -0.12, 0.12);
+  return { x, elev, day };
 }
 
 export function createAuroraCurtain(lite: boolean): AuroraCurtain {
   const scene = new THREE.Scene(), camera = new THREE.Camera();
   const geometry = new THREE.PlaneGeometry(2, 2);
-  let viewWidth=1, viewHeight=1;
+  let viewWidth=1, viewHeight=1, sunAt=-1;
   const reflection = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, depthBuffer: true });
   const uniforms = { uTime: { value: 0 }, uFlow: { value: 0 }, uRush: { value: 0 }, uFlash: { value: 0 }, uCalm: { value: 0 }, uTrace: { value: 0 }, uAspect: { value: 1 }, uLevel: { value: 0 }, uHorizon: { value: -0.2 },
     uLogo: { value: new THREE.Vector2(0, 0.1) }, uAbsorb: { value: new THREE.Vector2(0,0.1) },
     uFormation: { value: new THREE.Vector2(0,0.1) }, uLogoSize: { value: new THREE.Vector2(1, 0.33) },
-    uWaterSpread: { value: 0 }, uWaterMotion: { value: 0 },
+    uWaterSpread: { value: 0 }, uWaterMotion: { value: 0 }, uSun: { value: new THREE.Vector3(0, 0.6, 1) },
     uReflection: { value: reflection.texture } };
   const material = new THREE.ShaderMaterial({
     uniforms, depthTest: false, depthWrite: false, toneMapped: false, transparent: true,
@@ -354,6 +404,18 @@ export function createAuroraCurtain(lite: boolean): AuroraCurtain {
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.frustumCulled = false; scene.add(mesh);
+  // The backdrop is soft light, so it is shaded at ~60% of the drawing buffer (a third of the pixel work) into a
+  // target, without blending, and then blended over the canvas at full size with linear filtering: same image,
+  // much smoother frame rate. The logo itself still renders at full resolution.
+  const SHADE_SCALE = lite ? 0.5 : 0.6;
+  const shade = new THREE.WebGLRenderTarget(1, 1, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false });
+  const blitScene = new THREE.Scene();
+  const blitMaterial = new THREE.ShaderMaterial({
+    uniforms: { uTex: { value: shade.texture } }, depthTest: false, depthWrite: false, toneMapped: false, transparent: true,
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: 'uniform sampler2D uTex; varying vec2 vUv; void main(){ gl_FragColor = texture2D(uTex, vUv); }',
+  });
+  const blit = new THREE.Mesh(geometry, blitMaterial); blit.frustumCulled = false; blitScene.add(blit);
   return {
     scene, camera, reflection,
     // CSS px relative to the canvas; shader space is height-normalised, y up, origin at the centre.
@@ -366,6 +428,7 @@ export function createAuroraCurtain(lite: boolean): AuroraCurtain {
       uniforms.uLogoSize.value.set(lw / height, lh / height);
       uniforms.uHorizon.value = 0.5 - horizonY / height;
       reflection.setSize(Math.max(1, Math.round(bw / 2)), Math.max(1, Math.round(bh / 2)));   // half-res: it is blurred anyway
+      shade.setSize(Math.max(1, Math.round(bw * SHADE_SCALE)), Math.max(1, Math.round(bh * SHADE_SCALE)));
     },
     focus(x,y) { uniforms.uAbsorb.value.set((x-viewWidth/2)/viewHeight,(viewHeight/2-y)/viewHeight); },
     formation(x,y) { uniforms.uFormation.value.set((x-viewWidth/2)/viewHeight,(viewHeight/2-y)/viewHeight); },
@@ -374,7 +437,17 @@ export function createAuroraCurtain(lite: boolean): AuroraCurtain {
       uniforms.uTime.value = seconds; uniforms.uFlow.value = flow; uniforms.uLevel.value = s.aurora;
       uniforms.uRush.value = s.rush; uniforms.uFlash.value = s.flash; uniforms.uCalm.value = s.calm;
       uniforms.uTrace.value = s.trace;
+      // the light follows the visitor's clock (re-read every 20 s; `?hour=20` previews)
+      if (seconds - sunAt > 20 || sunAt < 0) { sunAt = seconds; const k = sunFor(hourNow(), seconds); uniforms.uSun.value.set(k.x, k.elev, k.day); }
     },
-    dispose() { geometry.dispose(); material.dispose(); reflection.dispose(); },
+    draw(renderer) {
+      const prev = renderer.getRenderTarget();
+      material.blending = THREE.NoBlending;                       // the target keeps the shader's colour + alpha as is
+      renderer.setRenderTarget(shade); renderer.setClearColor(0x000000, 0); renderer.clear(true, false, false);
+      renderer.render(scene, camera);
+      renderer.setRenderTarget(prev);
+      renderer.render(blitScene, camera);                         // normal alpha blend, exactly as the shader did before
+    },
+    dispose() { geometry.dispose(); material.dispose(); reflection.dispose(); shade.dispose(); blitMaterial.dispose(); },
   };
 }

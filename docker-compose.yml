@@ -1,0 +1,7 @@
+services:
+  web:
+    build: .
+    image: infin8x-site
+    ports:
+      - "8080:80"
+    restart: unless-stopped

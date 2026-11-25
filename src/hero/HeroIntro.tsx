@@ -5,10 +5,14 @@ import { isLowEnd } from '../lib/env';
 import { useReducedMotion } from '../lib/useReducedMotion';
 import { brand } from '../content/site';
 import { WordmarkReveal } from '../components/WordmarkReveal';
+import { Icon } from '../components/Icon';
 
 gsap.registerPlugin(ScrollTrigger);
 const SEEN_KEY = 'infin8x:intro-seen';
 const seen = () => { try { return sessionStorage.getItem(SEEN_KEY) === '1'; } catch { return false; } };
+
+/** The intro plays at twice its authored pace (all timings above stay relative to each other). */
+const INTRO_SPEED = 2;
 
 export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
   const reduced = useReducedMotion();
@@ -137,7 +141,7 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
         });
         tl.fromTo(copy,{opacity:0,y:14},{opacity:1,y:0,duration:0.7*S,stagger:0.1*S,ease:'power3.out'},wordmarkStart+0.8*W);
         tlRef.current=tl;
-        tl.play(0);
+        tl.timeScale(INTRO_SPEED).play(0);
       });
       if (import.meta.env.DEV) (window as unknown as {__sculpture: unknown}).__sculpture = {scene, timeline:tlRef.current};
       updatePlayback();
@@ -240,8 +244,8 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
         <p className="hero__tagline" data-reveal>{brand.coreLine}</p>
         <p className="hero__summary" data-reveal>{brand.servicesLine}</p>
         <div className="hero__ctas" data-reveal>
-          <a className="btn btn--primary" href="#contact">{brand.projectCta}</a>
-          <a className="btn btn--ghost" href="#projects">{brand.workCta}</a>
+          <a className="btn btn--primary" href="#contact">{brand.projectCta}<Icon name="arrow" size={15} /></a>
+          <a className="btn btn--ghost" href="#projects">{brand.workCta}<Icon name="down" size={15} /></a>
         </div>
       </div>
       {playing && <button type="button" className="hero__skip" onClick={() => { skipRef.current = true; tlRef.current?.progress(1); }}>Skip intro <span aria-hidden="true">→</span></button>}

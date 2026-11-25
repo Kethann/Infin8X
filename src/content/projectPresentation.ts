@@ -18,33 +18,33 @@ export const projectPresentation: Record<string, ProjectPresentation> = {
     ],
   },
   'dolly-design-studio': {
-    name: 'Dolly', subtitle: 'A home for the studio’s work.', light: '196 116 122',
-    statement: 'Let the portfolio lead.',
+    name: 'Dolly', subtitle: 'Posters, title design, typography and logos.', light: '214 160 92',
+    statement: 'The cover page of cinema.',
     notes: [
-      {label:'Studio identity',text:'The website brings the studio’s portfolio and visual identity into one place.'},
-      {label:'Editorial space',text:'Large type and open layouts keep the portfolio easy to browse.'},
-      {label:'Material contrast',text:'Sculptural forms and warm colours frame the work.'},
+      {label:'The studio',text:'Dolly Design Studio specialises in film publicity and title design.'},
+      {label:'Cinema first',text:'The site presents the studio as the cover page of a book called Cinema.'},
+      {label:'Gold on maroon',text:'A gold marquee logo and drifting stars give the site a classic film mood.'},
       {label:'The foundation',text:'Web design, portfolio structure and SEO form the project’s focus.'},
     ],
   },
-  'delivery-robot-sn15': {
-    name: 'SN15', subtitle: 'Exploring autonomous indoor delivery.', light: '153 144 228',
-    statement: 'Map the space. Plan the route.',
+  'unicre8': {
+    name: 'UC8', subtitle: 'Marketing, content and web in one place.', light: '240 132 52',
+    statement: 'Make the brand stop the scroll.',
     notes: [
-      {label:'Indoor delivery',text:'The project explores how a robot can navigate indoors to deliver items.'},
-      {label:'Spatial awareness',text:'Mapping records the space; localisation identifies the robot’s position within it.'},
-      {label:'Navigation',text:'Path planning finds a route from the robot’s position to its destination.'},
-      {label:'The foundation',text:'ROS 2, navigation and computer vision underpin this robotics exploration.'},
+      {label:'The studio',text:'UniCre8 is a digital marketing, content and web studio.'},
+      {label:'One place',text:'From shoots and edits to design and the website, the brand’s work is handled in one place.'},
+      {label:'The work table',text:'A filterable work table presents the studio’s client projects.'},
+      {label:'The foundation',text:'Web design, development and motion for the studio’s own site.'},
     ],
   },
-  'amuse-portfolio': {
-    name: 'Amuse', subtitle: 'Creative work, type and motion.', light: '113 178 232',
-    statement: 'A portfolio with room to explore.',
+  'ka': {
+    name: 'KA', subtitle: 'Ideas, unfolded.', light: '232 88 64',
+    statement: 'Visual stories. Crafted with intention.',
     notes: [
-      {label:'Creative collection',text:'The concept brings different creative projects into one portfolio.'},
-      {label:'Type in focus',text:'Expressive lettering gives the portfolio its visual character.'},
-      {label:'A sense of movement',text:'Orbiting forms add motion and depth around the central identity.'},
-      {label:'The foundation',text:'Portfolio design and motion define the concept.'},
+      {label:'Art meets engineering',text:'Graphic design, UI/UX, full-stack apps and robotics, presented in one portfolio.'},
+      {label:'Film publicity',text:'Campaign and publicity design for theatrical releases sits beside interface and brand work.'},
+      {label:'A crafted opening',text:'The site opens on the KA mark, lit like crystal.'},
+      {label:'The foundation',text:'Design, motion and code in one personal site.'},
     ],
   },
 };

@@ -5,6 +5,9 @@ import { useReducedMotion } from '../lib/useReducedMotion';
 import { prefersReducedMotion } from '../lib/env';
 
 let busy = false;
+/** A section a link asked for on another route (e.g. "All projects" → `/#projects`): home jumps there once it exists. */
+let pendingSection: string | null = null;
+export const takePendingSection = () => { const s = pendingSection; pendingSection = null; return s; };
 let activeTransition: gsap.core.Timeline | undefined;
 /**
  * Soft light dissolve between routes (no hard edge): a veil of blurred amber/steel light and frosted glass
@@ -29,7 +32,9 @@ export function TransitionLink({ to, children, className, ...rest }: { to: strin
     if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey || e.button !== 0) return;
     e.preventDefault();
     if (to === loc) { window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' }); return; }
-    runTransition(() => navigate(to));
+    const [path, hash] = to.split('#');
+    if (hash) pendingSection = `#${hash}`;
+    runTransition(() => navigate(hash ? path || '/' : to));
   };
   return <a href={to} onClick={click} className={className} {...rest}>{children}</a>;
 }

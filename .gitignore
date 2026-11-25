@@ -13,3 +13,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+# original uploaded fonts (personal-use demos): kept local, only the subset woff2s in public/fonts ship
+source-assets/fonts/uploads-1/
+source-assets/fonts/uploads-2/

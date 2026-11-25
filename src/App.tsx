@@ -8,7 +8,7 @@ import { CaseStudy } from './pages/CaseStudy';
 import { DebugOverlay } from './pages/DebugOverlay';
 import { Nav } from './components/Nav';
 import { Footer } from './components/Footer';
-import { Wipe } from './components/PageTransition';
+import { Wipe, takePendingSection } from './components/PageTransition';
 import { PrismFlow } from './components/PrismFlow';
 import { trackChapters } from './lib/chapters';
 import { useReducedMotion } from './lib/useReducedMotion';
@@ -129,10 +129,22 @@ export function App() {
     if (isTouch()) document.documentElement.classList.add('touch');
     if (isLowEnd()) document.documentElement.classList.add('lowend');
     if (loc === '/') document.title = 'Infin8X: Turning ideas into digital reality';
-    if (location.hash && loc === '/') {
-      const go = () => document.querySelector(location.hash)?.scrollIntoView();
-      window.addEventListener('infin8x:intro-done', go, { once: true });
-      return () => window.removeEventListener('infin8x:intro-done', go);
+    // Arriving at a section (a link from another page, or a shared `/#contact` link): wait only until that section has
+    // mounted (home mounts its sections one by one), finish the intro (it would play off screen), then jump to it.
+    const hash = loc === '/' ? takePendingSection() ?? (location.hash.length > 1 ? location.hash : null) : null;
+    if (hash && /^#[\w-]+$/.test(hash)) {
+      let raf = 0; const t0 = performance.now();
+      const tryJump = () => {
+        const el = document.querySelector<HTMLElement>(hash);
+        if (!el) { if (performance.now() - t0 < 8000) raf = requestAnimationFrame(tryJump); return; }
+        document.querySelector<HTMLButtonElement>('.hero__skip')?.click();
+        raf = requestAnimationFrame(() => {
+          if (lenis) lenis.scrollTo(el, { immediate: true, force: true }); else el.scrollIntoView();
+          history.replaceState(null, '', hash);
+        });
+      };
+      raf = requestAnimationFrame(tryJump);
+      return () => cancelAnimationFrame(raf);
     }
   }, [loc]);
   if (hasDebug()) return <DebugOverlay />;

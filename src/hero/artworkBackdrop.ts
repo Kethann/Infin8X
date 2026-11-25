@@ -175,7 +175,7 @@ export async function createArtworkBackdrop(canvas: HTMLCanvasElement, reduced: 
       renderer.setRenderTarget(null); holder.scale.y=1; holder.position.y=0;
       // 2. Backdrop (streams + floor), 3. the logo itself.
       renderer.clear(true,true,true);
-      renderer.render(aurora.scene,aurora.camera);
+      aurora.draw(renderer);
       renderer.clearDepth();
       renderer.render(scene,camera);
     };

@@ -1,5 +1,5 @@
 /** All section copy. `[PLACEHOLDER: …]` = owner must write it. `[CONFIRM]` = seed from the brief, confirm before publishing. */
-export type Accent = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'violet';
+export type Accent = 'red' | 'orange' | 'yellow' | 'magenta' | 'blue' | 'violet';
 export const accentVar = (a: Accent) => `var(--s-${a})`;
 
 /**
@@ -10,7 +10,7 @@ export const chapters = [
   { id: 'about', label: 'About', accent: 'red' as Accent },
   { id: 'services', label: 'Services', accent: 'orange' as Accent },
   { id: 'process', label: 'Process', accent: 'yellow' as Accent },
-  { id: 'projects', label: 'Work', accent: 'green' as Accent },
+  { id: 'projects', label: 'Work', accent: 'magenta' as Accent },
   { id: 'skills', label: 'Skills', accent: 'blue' as Accent },
   { id: 'contact', label: 'Contact', accent: 'violet' as Accent },
 ] as const;
@@ -41,10 +41,7 @@ export const skills = {
   title: 'Tools behind the work.',
   lead: 'Explore our tools and skills across development, AI, automation and data analysis.',
   indexLabel: 'Explore by discipline',
-  previewLabel: 'In focus',
-  previewHint: 'Hover, focus or tap a skill to explore.',
-  pauseMotion: 'Pause motion',
-  resumeMotion: 'Play motion',
+  previewLabel: 'Skill preview',
   footer: 'Chosen to suit the project.',
   footerLink: 'Explore the projects',
   accent: 'blue' as Accent,
@@ -58,8 +55,8 @@ export const services = {
   accent: 'orange' as Accent,
   items: [
     { name: 'Websites & web apps', icon: 'web' as const, accent: 'blue' as Accent, outcome: 'Fast, clear websites that help people find what they need.', points: ['Brand websites', 'Landing pages', 'Web apps', 'Performance & SEO'] },
-    { name: 'Apps & software', icon: 'app' as const, accent: 'green' as Accent, outcome: 'Custom tools that connect your systems and simplify daily work.', points: ['Custom software', 'Dashboards', 'APIs & backends', 'Cloud deployment'] },
-    { name: 'AI & automation', icon: 'ai' as const, accent: 'violet' as Accent, outcome: 'Assistants and automated workflows for the tasks that slow you down.', points: ['AI assistants', 'Workflow automation', 'Data pipelines', 'Robotics prototypes'] },
+    { name: 'Apps & software', icon: 'app' as const, accent: 'magenta' as Accent, outcome: 'Custom tools that connect your systems and simplify daily work.', points: ['Custom software', 'Dashboards', 'APIs & backends', 'Cloud deployment'] },
+    { name: 'AI & automation', icon: 'ai' as const, accent: 'violet' as Accent, outcome: 'Assistants and automated workflows for the tasks that slow you down.', points: ['AI assistants', 'Workflow automation', 'Data pipelines'] },
     { name: 'Motion & branding', icon: 'motion' as const, accent: 'red' as Accent, outcome: 'Intro animations and logo reveals that bring your brand to life.', points: ['Intro & logo animations', 'Logo & identity', 'Motion graphics', 'Social assets'] },
   ],
 };
@@ -68,16 +65,21 @@ export const processSteps = {
   eyebrow: 'Process',
   title: 'From idea to launch.',
   lead: 'Six steps, with working previews and space for your feedback.',
-  deliverableLabel: 'Deliverable',
+  deliverableLabel: 'You get',
   timeLabel: 'Typical time',
+  dialLabel: 'Process steps',
+  stepLabel: 'Step',
+  ofLabel: 'of',
+  prevLabel: 'Previous step',
+  nextLabel: 'Next step',
   accent: 'yellow' as Accent,
   steps: [
-    { n: '01', name: 'Discover', text: 'Share the goal, the audience and what matters most to your project.', deliverable: 'Project brief', time: '[PLACEHOLDER: e.g. 1–2 days]' },
-    { n: '02', name: 'Define', text: 'Agree on the scope, key features and constraints before work begins.', deliverable: 'Agreed scope', time: '[PLACEHOLDER]' },
-    { n: '03', name: 'Plan', text: 'Set the design direction, technical approach, milestones and budget.', deliverable: 'Project plan', time: '[PLACEHOLDER]' },
-    { n: '04', name: 'Build', text: 'Build in stages, with working previews for you to review.', deliverable: 'Working preview', time: '[PLACEHOLDER]' },
-    { n: '05', name: 'Refine', text: 'Share feedback, review the changes and fine-tune the experience.', deliverable: 'Reviewed changes', time: '[PLACEHOLDER]' },
-    { n: '06', name: 'Launch', text: 'Run the final checks, publish the project and hand it over.', deliverable: 'Launch & handover', time: '[PLACEHOLDER]' },
+    { n: '01', name: 'Discover', text: 'You tell us the goal, who it’s for and what matters most.', deliverable: 'Project brief', time: '[PLACEHOLDER: e.g. 1–2 days]' },
+    { n: '02', name: 'Define', text: 'Together we agree what’s included, the key features and any limits.', deliverable: 'Agreed scope', time: '[PLACEHOLDER]' },
+    { n: '03', name: 'Plan', text: 'We set the look, the technology, the milestones and the budget.', deliverable: 'Project plan', time: '[PLACEHOLDER]' },
+    { n: '04', name: 'Build', text: 'We build in stages and share working previews as we go.', deliverable: 'Working preview', time: '[PLACEHOLDER]' },
+    { n: '05', name: 'Refine', text: 'You review and give feedback; we fine-tune the details.', deliverable: 'Reviewed changes', time: '[PLACEHOLDER]' },
+    { n: '06', name: 'Launch', text: 'We run final checks, go live and hand everything over.', deliverable: 'Launch & handover', time: '[PLACEHOLDER]' },
   ],
 };
 
@@ -103,12 +105,12 @@ export const contact = {
 export const work = {
   eyebrow: 'Work',
   title: 'Selected work.',
-  lead: 'A selection of website, portfolio and robotics projects.',
+  lead: 'A selection of websites and portfolios.',
   footer: 'Have a project in mind?',
   footerLink: 'Start a conversation',
   empty: 'No projects in this category yet.',
   emptyLink: 'View all projects',
-  accent: 'green' as Accent,
+  accent: 'magenta' as Accent,
 };
 
 export const footer = {

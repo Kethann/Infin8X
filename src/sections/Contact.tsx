@@ -66,7 +66,7 @@ export function Contact() {
           <span className="contact__sweep" aria-hidden="true" />
           <div className="field"><label htmlFor="f-name">Name</label><input disabled={status === 'sending'} id="f-name" name="name" required autoComplete="name" maxLength={120} /><i aria-hidden="true" /></div>
           <div className="field"><label htmlFor="f-email">Email</label><input disabled={status === 'sending'} id="f-email" name="email" type="email" required autoComplete="email" maxLength={200} /><i aria-hidden="true" /></div>
-          <div className="field field--wide"><label htmlFor="f-idea">{contact.ideaLabel}</label><textarea disabled={status === 'sending'} id="f-idea" name="idea" required rows={5} maxLength={5000} placeholder={contact.ideaPlaceholder} /><i aria-hidden="true" /></div>
+          <div className="field field--wide"><label htmlFor="f-idea">{contact.ideaLabel}</label><textarea disabled={status === 'sending'} id="f-idea" name="idea" required rows={4} maxLength={5000} placeholder={contact.ideaPlaceholder} /><i aria-hidden="true" /></div>
           <div className="field field--wide"><label htmlFor="f-budget">{contact.budgetLabel}</label><input disabled={status === 'sending'} id="f-budget" name="budget" maxLength={80} placeholder={contact.budgetPlaceholder} /><i aria-hidden="true" /></div>
           <Choice disabled={status === 'sending'} name="timeline" legend="Timeline" options={contact.timelines} initial={contact.timelines[3]} />
           <input type="text" name="company" tabIndex={-1} autoComplete="off" className="hp" aria-hidden="true" />

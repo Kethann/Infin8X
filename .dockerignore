@@ -1,0 +1,14 @@
+node_modules
+dist
+shots
+docs
+exports
+source-assets
+.git
+.env
+.env.*
+*.log
+.*-tmp.mjs
+*.tsbuildinfo
+Dockerfile
+docker-compose.yml

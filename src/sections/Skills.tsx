@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { skillCategories, type SkillItem } from '../content/skills';
 import { skills as copy, accentVar } from '../content/sections';
 import { Chapter } from '../components/Chapter';
@@ -36,67 +36,97 @@ const CAT_ICON: Record<string, string> = {
   'AI tools': 'ai', 'AI & automation': 'net', 'Data & analytics': 'train', 'Data & ML': 'train', 'Python libraries': 'infer', Robotics: 'sensor',
 };
 
-/**
- * 05 Skills, laid out as a skills ledger: filter chips per discipline, then one glass row per discipline with its
- * icon and name on the left and every tool as a chip carrying its official logo. Hovering a chip shows what it is
- * for (screen readers hear it with the name). Filtering re-runs a short staggered entrance.
- */
+/** Stable category colours shared by the filters, labels and skill borders. */
+const CAT_COLOUR: Record<string, string> = {
+  Languages: '#f0c56a', Frontend: '#68cfea', '3D & animation': '#b6a0ff', Backend: '#7bdbb0',
+  Database: '#8eafff', APIs: '#f5a580', 'DevOps & tools': '#a9d879', 'AI tools': '#e8a0c8',
+  'AI & automation': '#d7a0fa', 'Data & analytics': '#76d8d0', 'Data & ML': '#99bbed',
+  'Python libraries': '#dfce86', Robotics: '#f0a4ac',
+};
+
+/** One wrapping sequence in category order, with a responsive animated preview. */
 export function Skills() {
   const [filter, setFilter] = useState<string>('All');
-  const [selected, setSelected] = useState<SkillItem>(() => skillCategories.flatMap(c => c.items).find(t => t.name === 'Three.js')!);
+  const [hovered, setHovered] = useState<SkillItem | null>(null);
+  const [focused, setFocused] = useState<SkillItem | null>(null);
   const total = skillCategories.reduce((sum, c) => sum + c.items.length, 0);
-  const shown = skillCategories.filter((c) => filter === 'All' || c.name === filter);
-  const items = shown.flatMap(c => c.items);
-  const active = items.find(t => t.name === selected.name) ?? items[0];
-  const featured = ['Three.js', 'GSAP', 'React', 'Python', 'n8n workflows', 'Power BI'];
-  const cloudItems = filter === 'All' ? featured.map(name => items.find(t => t.name === name)!).filter(Boolean) : items;
+  const shown = useMemo(() => skillCategories.filter((c) => filter === 'All' || c.name === filter), [filter]);
+  const items = useMemo(() => shown.flatMap(c => c.items), [shown]);
+  const active = items.find(t => t.name === (hovered ?? focused)?.name) ?? null;
+  // Fade the right edge only while more categories remain off-screen.
+  const filtersRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = filtersRef.current; if (!el) return;
+    const check = () => el.toggleAttribute('data-overflow', el.scrollWidth - el.clientWidth - el.scrollLeft > 2);
+    const ro = new ResizeObserver(check); ro.observe(el); check();
+    el.addEventListener('scroll', check, { passive: true });
+    document.fonts?.ready.then(check);
+    return () => { ro.disconnect(); el.removeEventListener('scroll', check); };
+  }, []);
   return (
     <section id="skills" className="section skills" data-chapter="skills" data-chapter-label="Skills"
       style={{ '--section-accent': accentVar(copy.accent) } as CSSProperties} aria-labelledby="skills-h">
       <div className="page">
         <div className="skills__head">
           <Chapter id="skills" titleId="skills-h" title={copy.title} lead={copy.lead} />
-          <dl className="skills__stats" data-reveal>
+          <dl className="skills__stats">
             <div><dt>Disciplines</dt><Count to={skillCategories.length} /></div>
             <div><dt>Tools & capabilities</dt><Count to={total} /></div>
           </dl>
         </div>
 
-        <div className="skills__filters" role="group" aria-label={copy.indexLabel} data-reveal>
+        <div className="skills__body">
+        <div ref={filtersRef} className="skills__filters" role="group" aria-label={copy.indexLabel} data-reveal>
           {['All', ...skillCategories.map((c) => c.name)].map((name) => (
-            <button key={name} type="button" aria-pressed={filter === name} onClick={() => setFilter(name)}>
+            <button key={name} type="button" aria-pressed={filter === name}
+              style={{ '--category-colour': CAT_COLOUR[name] ?? '#8eafff' } as CSSProperties}
+              onClick={() => { setFilter(name); setHovered(null); setFocused(null); }}>
               {name !== 'All' && <Icon name={CAT_ICON[name] ?? 'skills'} size={13} />}
               {name}<sup>{name === 'All' ? total : skillCategories.find((c) => c.name === name)!.items.length}</sup>
             </button>
           ))}
         </div>
 
-        <div className="skills__body">
-        <SkillCloud items={cloudItems} active={active} />
-        <ul className="ledger" key={filter}>
-          {shown.map((c, ci) => (
-            <li key={c.name} className="ledger__row" style={{ '--ri': ci } as CSSProperties}>
-              <div className="ledger__cat">
-                <span className="ledger__icon" aria-hidden="true"><Icon name={CAT_ICON[c.name] ?? 'skills'} size={16} /></span>
-                <h3>{c.name}</h3>
-                <span className="ledger__count" aria-hidden="true">{String(c.items.length).padStart(2, '0')}</span>
-              </div>
-              <ul className="ledger__chips" aria-label={`${c.name}: ${c.blurb}`}>
-                {c.items.map((t, ti) => (
-                  <li key={t.name} className={`chip${active.name === t.name ? ' is-active' : ''}`} data-note={t.note} style={{ '--tc': (() => { const l = toolLogos[t.name]; return l && 'path' in l ? readable(l.hex) : t.color; })(), '--ti': ti } as CSSProperties}>
-                    <button type="button" className="chip__button" aria-pressed={active.name === t.name}
-                      onPointerMove={(event) => { if (event.pointerType === 'mouse') setSelected(t); }}
-                      onFocus={() => setSelected(t)} onClick={() => setSelected(t)}>
-                      <span className="chip__mark" aria-hidden="true"><SkillLogo name={t.name} /></span>
-                      <span>{t.name}<span className="sr-only">: {t.note}</span></span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              {c.items.some(t => t.name === active.name) && <p className="ledger__detail"><strong>{active.name}</strong> — {active.note}</p>}
-            </li>
-          ))}
+        {/* Keep filters above the changing preview so selecting a skill cannot move their click targets. */}
+        <div className="skills__preview">
+          <SkillCloud items={items} active={active} />
+        </div>
+
+        <div className="skills__catalogue">
+        <ul className="ledger" key={filter} aria-label="Skills by category">
+          {shown.map(c => {
+            const categoryId = `skill-category-${c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+            return (
+              <li key={c.name} className="ledger__group" style={{ '--category-colour': CAT_COLOUR[c.name] ?? '#8eafff', '--n': c.items.length } as CSSProperties}>
+                <h3 id={categoryId} className="ledger__tag">
+                  <Icon name={CAT_ICON[c.name] ?? 'skills'} size={12} />
+                  <span>{c.name}</span>
+                  <span className="ledger__count" aria-hidden="true">{String(c.items.length).padStart(2, '0')}</span>
+                </h3>
+                <ul className="ledger__chips" aria-labelledby={categoryId}>
+                  {c.items.map(t => {
+                    const logo = toolLogos[t.name];
+                    return (
+                      <li key={t.name} className="ledger__entry" style={{ '--tc': logo && 'path' in logo ? readable(logo.hex) : t.color } as CSSProperties}>
+                        <span className={`chip${active?.name === t.name ? ' is-active' : ''}`}>
+                          <button type="button" className="chip__button" aria-pressed={active?.name === t.name} aria-describedby={categoryId}
+                            onPointerMove={(event) => { if (event.pointerType === 'mouse' && hovered !== t) setHovered(t); }}
+                            onPointerLeave={() => setHovered(null)}
+                            onFocus={() => { setHovered(null); setFocused(t); }} onBlur={() => setFocused(null)}>
+                            <span className="chip__mark" aria-hidden="true"><SkillLogo name={t.name} /></span>
+                            <span>{t.name}<span className="sr-only">: {t.note}</span></span>
+                          </button>
+                        </span>
+                        {focused?.name === t.name && <p className="ledger__detail"><strong>{t.name}</strong> — {t.note}</p>}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            );
+          })}
         </ul>
+        </div>
         </div>
 
         <div className="skills__footer" data-reveal>

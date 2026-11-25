@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { toolLogos } from '../content/toolLogos';
 import { Icon } from './Icon';
 
@@ -7,9 +8,9 @@ export function readable(hex: string) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b > 70 ? `#${hex}` : '#e9eef6';
 }
 
-export function SkillLogo({ name }: { name: string }) {
+export const SkillLogo = memo(function SkillLogo({ name }: { name: string }) {
   const logo = toolLogos[name];
   if (logo && 'path' in logo) return <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d={logo.path} fill={readable(logo.hex)} /></svg>;
   if (logo && 'src' in logo) return <img src={logo.src} width="24" height="24" alt="" loading="lazy" decoding="async" draggable={false} />;
   return <Icon name={logo && 'icon' in logo ? logo.icon : 'api'} size={24} />;
-}
+});

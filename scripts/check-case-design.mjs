@@ -1,7 +1,7 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 const browser=await chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--enable-unsafe-swiftshader']});
-const slugs=['kaaya-cafe','dolly-design-studio','delivery-robot-sn15','amuse-portfolio'];
+const slugs=['kaaya-cafe','dolly-design-studio','unicre8','ka'];
 try {
  for(const width of [320,390,768,1440]) {
   const page=await browser.newPage({viewport:{width,height:960},reducedMotion:width===390?'reduce':'no-preference'});

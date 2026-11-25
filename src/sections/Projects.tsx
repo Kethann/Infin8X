@@ -9,14 +9,20 @@ import { ProjectCover } from './ProjectCover';
 const WIDE = '(min-width: 960px)';
 
 /**
- * 04 Work. A reel: on wide screens the project names form an index on the left and a large preview on the right
- * cross-dissolves to whichever project is hovered or focused, with its details. On narrow screens every project is
- * a card with its own cover. Every entry is a real link to the project page.
+ * 04 Work. On wide screens: a compact index of names on the left and, on the right, one 16:10 screen split 2×2 (like a
+ * split watch face) with every project's full site in a quarter. At rest the quarters are equal; hovering or focusing
+ * a name (or a tile) widens its column and row 3:1, so it enlarges into focus while the others shrink. Every tile is
+ * filled by the version of its site that suits its shape, like resizing a browser: desktop when wide, the tablet
+ * capture when near square, the phone capture when tall (container queries, cross-faded). The details follow it. On narrow screens every project is a card with its own cover.
+ * Every entry is a real link to the project page.
  */
 export function Projects() {
   const [cat, setCat] = useState<(typeof categories)[number]>('All');
   const list = projects.filter((p) => cat === 'All' || p.category === cat);
   const [activeSlug, setActive] = useState<string | undefined>(list[0]?.slug);
+  // the slice that is expanded right now (null = all equal); the details keep the last one shown
+  const [hovered, setHovered] = useState<string | null>(null);
+  const focusOn = (slug: string) => { setActive(slug); setHovered(slug); };
   const [wide, setWide] = useState(() => window.matchMedia(WIDE).matches);
   useEffect(() => {
     const m = window.matchMedia(WIDE);
@@ -43,12 +49,13 @@ export function Projects() {
         {list.length === 0 ? (
           <div className="work__empty"><h3>{work.empty}</h3><button type="button" onClick={() => filter('All')}>{work.emptyLink} ↗</button></div>
         ) : (
-          <div className="reel" data-reveal>
+          <div className="reel" data-reveal onMouseLeave={() => setHovered(null)}
+            onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setHovered(null); }}>
             <ol className="reel__index">
               {list.map((p) => (
                 <li key={p.slug} className={p.slug === active?.slug ? 'is-active' : ''} style={{ '--c': accentVar(p.accent) } as CSSProperties}>
                   <TransitionLink to={`/work/${p.slug}`} className="reel__link" aria-label={`${p.title}: view project`}
-                    onMouseEnter={() => setActive(p.slug)} onFocus={() => setActive(p.slug)}>
+                    onMouseEnter={() => focusOn(p.slug)} onFocus={() => focusOn(p.slug)}>
                     <span className="reel__name">{p.name}</span>
                     <span className="reel__disc">{p.discipline}</span>
                     <Icon name="arrow" size={20} className="reel__arrow" />
@@ -65,13 +72,22 @@ export function Projects() {
             </ol>
             {wide && active && (
               <div className="reel__stage" aria-live="polite">
-                <div className="reel__screen">
-                  {list.map((p) => (
-                    <div key={p.slug} className={`reel__frame ${p.slug === active.slug ? 'is-on' : ''}`} aria-hidden={p.slug !== active.slug}>
-                      <ProjectCover accent={p.accent} label={p.title} slug={p.slug} src={p.cover} />
-                    </div>
+                <div className={`reel__split${hovered ? ' has-focus' : ''}`} style={(() => {
+                  const i = hovered ? list.findIndex((p) => p.slug === hovered) : -1;
+                  const big = 3, col = i % 2, row = Math.floor(i / 2);
+                  return i < 0 ? undefined : {
+                    gridTemplateColumns: `${col === 0 ? big : 1}fr ${col === 1 ? big : 1}fr`,
+                    gridTemplateRows: `${row === 0 ? big : 1}fr ${row === 1 ? big : 1}fr`,
+                  };
+                })()}>
+                  {list.slice(0, 4).map((p) => (
+                    <TransitionLink key={p.slug} to={`/work/${p.slug}`} tabIndex={-1} aria-hidden="true"
+                      className={`reel__slice${p.slug === hovered ? ' is-open' : ''}`} style={{ '--c': accentVar(p.accent) } as CSSProperties}
+                      onMouseEnter={() => focusOn(p.slug)}>
+                      <span className="reel__slice-view"><ProjectCover accent={p.accent} label={p.title} slug={p.slug} src={p.cover} srcMobile={p.coverMobile} srcTablet={p.coverTablet} eager /></span>
+                      <span className="reel__slice-tag">{p.name}</span>
+                    </TransitionLink>
                   ))}
-                  <i className="reel__glare" aria-hidden="true" />
                 </div>
                 <div className="reel__info" key={active.slug} style={{ '--c': accentVar(active.accent) } as CSSProperties}>
                   <p className="reel__cat"><i aria-hidden="true" />{active.category}</p>
