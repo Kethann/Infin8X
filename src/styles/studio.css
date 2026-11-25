@@ -32,8 +32,15 @@
   background: radial-gradient(closest-side, #fff, rgba(255,255,255,.5) 40%, transparent); animation: ray-flow 5.5s cubic-bezier(.45,0,.55,1) infinite 2s; opacity: 0; }
 @keyframes ray-flow { 0% { transform: translateX(0); opacity: 0; } 8% { opacity: 1; } 70% { opacity: .9; } 85% { transform: translateX(calc(100vw - 120px)); opacity: 0; } 100% { opacity: 0; } }
 .about__beam li { position: relative; }
-.about__node { position: absolute; left: 0; top: -46px; width: 14px; height: 14px; border-radius: 50%; background: #070b16; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.85), 0 0 16px rgba(255,255,255,.4); }
-.about__beam li:nth-child(4) .about__node { background: conic-gradient(var(--s-red), var(--s-orange), var(--s-yellow), var(--s-magenta), var(--s-blue), var(--s-violet), var(--s-red)); box-shadow: 0 0 20px rgba(255,140,120,.5); }
+/* the markers on the line: small glowing rhombuses; a glow passes from one to the next */
+.about__node { position: absolute; left: 1px; top: -45px; width: 12px; height: 12px; border-radius: 2px; transform: rotate(45deg); background: #070b16;
+  --glow: rgba(214,228,255,.75); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 0 10px -2px var(--glow);
+  animation: node-glow 4.5s ease-in-out infinite; animation-delay: calc(var(--i) * 1.5s); }
+@keyframes node-glow {
+  0%, 100% { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 0 10px -2px var(--glow); }
+  18% { box-shadow: inset 0 0 0 1.5px #fff, 0 0 18px 2px var(--glow), 0 0 34px 6px color-mix(in srgb, var(--glow) 35%, transparent); }
+  40% { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.9), 0 0 10px -2px var(--glow); } }
+.about__beam li:nth-child(4) .about__node { --glow: rgba(255,140,170,.8); background: conic-gradient(var(--s-red), var(--s-orange), var(--s-yellow), var(--s-magenta), var(--s-blue), var(--s-violet), var(--s-red)); }
 .about__label { font: 700 clamp(1.375rem, 1.2rem + .6vw, 1.75rem)/1.1 var(--font-name); font-optical-sizing: auto; letter-spacing: -.02em; color: #e9eef6; margin-bottom: 10px; }
 .about__line { font-size: var(--fs-lead); line-height: 1.5; color: #e3e8f1; max-width: 28ch; text-wrap: pretty; }
 @media (min-width: 800px) { .about__beam { grid-template-columns: repeat(3, 1fr); gap: 40px; } }
@@ -41,7 +48,7 @@
   .about__beam { padding: 0 0 0 34px; }
   .about__ray { left: 6px; right: auto; top: -10px; bottom: -10px; width: 2px; height: auto; transform-origin: top;
     background: linear-gradient(180deg, transparent, #fff 10%, #fff 60%, var(--s-red) 72%, var(--s-yellow) 82%, var(--s-blue) 92%, var(--s-violet)); }
-  .about__node { left: -34px; top: 4px; }
+  .about__node { left: -33px; top: 5px; }
 }
 .motion .about__beam .about__ray { transform: scaleX(0); transition: transform 1.8s var(--ease-light); }
 .motion .about__beam li { opacity: 0; transform: translateY(14px); filter: blur(6px); transition: opacity .8s var(--ease-out), transform 1s var(--ease-out), filter .8s; transition-delay: calc(.45s + var(--i) * .3s); }
@@ -639,10 +646,12 @@
 @keyframes form-sweep { from { background-position: 120% 0; } to { background-position: -20% 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .about__ray::after, .reel__index > li.is-active::after { animation: none; }
+  .about__ray::after, .reel__index > li.is-active::after, .about__node { animation: none; }
   .svc__beam, .reel__split, .reel__slice::after, .reel__name, .reel__link::before, .reel__slice-view .project-study > img, .field > i { transition: none; }
   .reel__link::after { animation: none !important; }
 }
 @media (pointer: coarse) { .work__filters button, .skills__filters button, .choice__opt span { min-height: 44px; } }
 @media (forced-colors: active) { .svc, .contact__form, .reel__split { border: 1px solid CanvasText; } }
 @media (max-width: 799px) { .about__ray::after { display: none; } }
+
+.lowend .about__node { animation: none; }

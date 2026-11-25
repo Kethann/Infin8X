@@ -33,7 +33,7 @@ function useSmoothScroll(reduced: boolean) {
       const id = a.getAttribute('href')!.replace('/', '');
       const target = document.querySelector<HTMLElement>(id);
       if (!target) return;
-      e.preventDefault(); lenis?.scrollTo(target, { offset: 0, duration: 1.4 });
+      e.preventDefault(); lenis?.scrollTo(target, { offset: -jumpRoom(target), duration: 1.4 });
       history.replaceState(null, '', id);
       target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true });
     };
@@ -117,6 +117,9 @@ function useGlassLight(reduced: boolean) {
   }, [reduced]);
 }
 
+/** Room left above a section when jumping to it, so its large name lands below the fixed nav (and the top fade). */
+const jumpRoom = (el: Element) => (el.matches('.section[data-chapter]') ? (innerWidth < 1000 ? 52 : 32) : 0);
+
 export function App() {
   const [loc] = useLocation();
   const reduced = useReducedMotion();
@@ -139,7 +142,7 @@ export function App() {
         if (!el) { if (performance.now() - t0 < 8000) raf = requestAnimationFrame(tryJump); return; }
         document.querySelector<HTMLButtonElement>('.hero__skip')?.click();
         raf = requestAnimationFrame(() => {
-          if (lenis) lenis.scrollTo(el, { immediate: true, force: true }); else el.scrollIntoView();
+          if (lenis) lenis.scrollTo(el, { immediate: true, force: true, offset: -jumpRoom(el) }); else el.scrollIntoView();
           history.replaceState(null, '', hash);
         });
       };
