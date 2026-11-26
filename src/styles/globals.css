@@ -138,7 +138,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing:
 @media (max-height: 650px) and (min-width: 768px) { .hero { --wm-size: clamp(56px, 10vw, 130px); } }
 
 /* Original extracted artwork: no type, recolouring, or geometric approximation. */
-.hero--exact { perspective: 1400px; height: auto; min-height: max(560px, 100svh); padding-bottom: clamp(56px, 8svh, 96px); --hero-wordmark-gap: 12px;
+.hero--exact { perspective: 1400px; height: auto; min-height: max(560px, 100svh); padding-bottom: clamp(32px, 5svh, 64px); --hero-wordmark-gap: 12px;
   --hero-artwork-width: min(84vw, 1120px, 125svh);
   --hero-artwork-height: calc(var(--hero-artwork-width) * 936 / 2787);
   --hero-artwork-top: clamp(112px, 18svh, 220px); }
@@ -241,7 +241,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing:
 .hero--sculpture .hero__original { opacity: 0; }
 .hero--sculpture .hero__gl { z-index: 4; }
 .hero--sculpture .hero__artwork-stage { pointer-events: none; }
-.hero--sculpture.is-settled .hero__artwork-stage { z-index: 5; pointer-events: auto; touch-action: none; cursor: grab; user-select: none; }
+.hero--sculpture.is-settled .hero__artwork-stage { z-index: 5; pointer-events: auto; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
 .hero--sculpture.is-settled .hero__artwork-stage.is-dragging { cursor: grabbing; }
 /* no rectangle around the logo while it is dragged or focused (also no mobile tap highlight) */
 .hero__artwork-stage, .hero__artwork-stage:focus, .hero__artwork-stage:focus-visible { outline: none; -webkit-tap-highlight-color: transparent; }

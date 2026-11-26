@@ -52,6 +52,8 @@ export const services = {
   title: 'What we can build together.',
   lead: 'From a new website to a custom tool, choose the support your project needs.',
   cta: 'Discuss your project',
+  showDetails: 'Show details',
+  hideDetails: 'Hide details',
   accent: 'orange' as Accent,
   items: [
     { name: 'Websites & web apps', icon: 'web' as const, accent: 'blue' as Accent, outcome: 'Fast, clear websites that help people find what they need.', points: ['Brand websites', 'Landing pages', 'Web apps', 'Performance & SEO'] },
@@ -63,6 +65,7 @@ export const services = {
 
 export const processSteps = {
   eyebrow: 'Process',
+  backdropText: 'Every pixel matters',
   title: 'From idea to launch.',
   lead: 'Six steps, with working previews and space for your feedback.',
   deliverableLabel: 'You get',
@@ -72,6 +75,8 @@ export const processSteps = {
   ofLabel: 'of',
   prevLabel: 'Previous step',
   nextLabel: 'Next step',
+  hint: 'Hover or tap a step to read it',
+  closeLabel: 'Close',
   accent: 'yellow' as Accent,
   steps: [
     { n: '01', name: 'Discover', text: 'You tell us the goal, who it’s for and what matters most.', deliverable: 'Project brief', time: '[PLACEHOLDER: e.g. 1–2 days]' },
@@ -110,6 +115,10 @@ export const work = {
   footerLink: 'Start a conversation',
   empty: 'No projects in this category yet.',
   emptyLink: 'View all projects',
+  galleryHint: 'Pick a project. Step inside.',
+  projectLink: 'View project',
+  pausePreview: 'Pause preview',
+  playPreview: 'Play preview',
   accent: 'magenta' as Accent,
 };
 

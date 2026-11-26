@@ -21,25 +21,47 @@ let lenis: Lenis | null = null;
 
 function useSmoothScroll(reduced: boolean) {
   useEffect(() => {
-    if (reduced || isTouch() || isLowEnd()) return;
-    // light inertia: close to native scrolling, just softened (no heavy glide, no overscroll hold)
-    lenis = new Lenis({ lerp: 0.12, wheelMultiplier: 1, smoothWheel: true, syncTouch: false });
-    lenis.on('scroll', ScrollTrigger.update);
-    const raf = (t: number) => lenis?.raf(t * 1000);
-    gsap.ticker.add(raf); gsap.ticker.lagSmoothing(0);
-    // anchor links glide through Lenis
+    // Wheel smoothing is inexpensive and independent of WebGL support. Touch keeps native momentum.
+    const scroll = !reduced && !isTouch() ? new Lenis({
+      lerp: 0.085, wheelMultiplier: 0.95, smoothWheel: true, syncTouch: false,
+      prevent: (node) => !!node.closest('#mobile-menu, textarea, [data-lenis-prevent]'),
+    }) : null;
+    lenis = scroll;
+    scroll?.on('scroll', ScrollTrigger.update);
+    const raf = (t: number) => scroll?.raf(t * 1000);
+    if (scroll) gsap.ticker.add(raf);
+    // Let an open menu stop an in-flight wheel glide as well as native scrolling.
+    const lock = () => { if (document.body.style.overflow === 'hidden') scroll?.stop(); else scroll?.start(); };
+    const observer = scroll ? new MutationObserver(lock) : null;
+    observer?.observe(document.body, { attributes: true, attributeFilter: ['style'] });
+    lock();
+    let anchorFrame = 0;
+    // Same-page links glide on phones too. Cross-page links keep their existing route transition.
     const onClick = (e: MouseEvent) => {
-      const a = (e.target as Element).closest<HTMLAnchorElement>('a[href^="#"], a[href^="/#"]');
-      if (!a || location.pathname !== '/') return;
-      const id = a.getAttribute('href')!.replace('/', '');
-      const target = document.querySelector<HTMLElement>(id);
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+      const a = (e.target as Element).closest<HTMLAnchorElement>('a[href]');
+      if (!a || a.hasAttribute('download') || (a.target && a.target !== '_self')) return;
+      const url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || url.pathname !== location.pathname || !url.hash) return;
+      let id: string;
+      try { id = decodeURIComponent(url.hash.slice(1)); } catch { return; }
+      const target = document.getElementById(id);
       if (!target) return;
-      e.preventDefault(); lenis?.scrollTo(target, { offset: -jumpRoom(target), duration: 1.4 });
-      history.replaceState(null, '', id);
-      target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true });
+      e.preventDefault();
+      cancelAnimationFrame(anchorFrame);
+      anchorFrame = requestAnimationFrame(() => {
+        const instant = reduced || id === 'main';
+        if (scroll) scroll.scrollTo(target, { offset: -jumpRoom(target), immediate: instant, duration: 1.05 });
+        else window.scrollTo({ top: target.getBoundingClientRect().top + scrollY - jumpRoom(target), behavior: instant ? 'auto' : 'smooth' });
+        history.replaceState(null, '', url.hash);
+        target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true });
+      });
     };
     document.addEventListener('click', onClick);
-    return () => { gsap.ticker.remove(raf); lenis?.destroy(); lenis = null; document.removeEventListener('click', onClick); };
+    return () => {
+      cancelAnimationFrame(anchorFrame); observer?.disconnect(); gsap.ticker.remove(raf);
+      scroll?.destroy(); lenis = null; document.removeEventListener('click', onClick);
+    };
   }, [reduced]);
 }
 
@@ -106,8 +128,8 @@ function useGlassLight(reduced: boolean) {
       raf = 0;
       if (document.hidden) return;
       const vh = innerHeight;
-      document.querySelectorAll<HTMLElement>('.glass, .nav__bar').forEach((el) => {
-        const r = el.getBoundingClientRect();
+      const surfaces = Array.from(document.querySelectorAll<HTMLElement>('.glass, .nav__bar'), el => ({ el, r: el.getBoundingClientRect() }));
+      surfaces.forEach(({ el, r }) => {
         if (r.bottom < 0 || r.top > vh) return;
         el.style.setProperty('--ly', ((r.top + r.height / 2) / vh).toFixed(3));
       });
@@ -119,7 +141,7 @@ function useGlassLight(reduced: boolean) {
 }
 
 /** Room left above a section when jumping to it, so its large name lands below the fixed nav (and the top fade). */
-const jumpRoom = (el: Element) => (el.matches('.section[data-chapter]') ? (innerWidth < 1000 ? 52 : 32) : 0);
+const jumpRoom = (el: Element) => parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
 
 export function App() {
   const [loc] = useLocation();
@@ -130,6 +152,8 @@ export function App() {
   usePointerLight(reduced);
   useChapterTracking(loc);
   useEffect(() => {
+    // A route change cancels any remaining wheel momentum from the previous page.
+    lenis?.scrollTo(window.scrollY, { immediate: true, force: true });
     if (isTouch()) document.documentElement.classList.add('touch');
     if (isLowEnd()) document.documentElement.classList.add('lowend');
     if (loc === '/') document.title = 'Infin8X: Turning ideas into digital reality';

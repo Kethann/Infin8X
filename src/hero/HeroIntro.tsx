@@ -155,7 +155,7 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
     const canRotate = () => !!backdrop && !contextLost && root.classList.contains('is-settled');
     const down = (event:PointerEvent) => {
       if (!canRotate() || drag || !event.isPrimary || event.button!==0 || (event.target as Element).closest('button')) return;
-      event.preventDefault();
+      if (event.pointerType === 'mouse') event.preventDefault();
       stage.focus({preventScroll:true});
       stage.setPointerCapture(event.pointerId);
       backdrop?.beginRotation();
@@ -237,7 +237,7 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
         <img ref={logoRef} className="hero__original" src="/brand/infinity-white-entry.webp" width="2787" height="936" alt="Infin8X infinity symbol" draggable={false} onError={event => {
           if (!event.currentTarget.src.endsWith('.png')) event.currentTarget.src = '/brand/infinity-extracted.png';
         }} />
-        <span id="logo-rotation-help" className="sr-only">Drag in any direction to rotate through 360 degrees. Release to return to the original pose. Hold the arrow keys to turn, Shift for larger steps, and Home to return to the original pose.</span>
+        <span id="logo-rotation-help" className="sr-only">Drag to rotate through 360 degrees. On touch screens, drag horizontally to rotate or swipe vertically to scroll. Release to return to the original pose. Hold the arrow keys to turn, Shift for larger steps, and Home to return to the original pose.</span>
       </div>
       <div className="hero__details">
         <div className="hero__brand"><WordmarkReveal /></div>

@@ -36,17 +36,14 @@ export function isLowEnd() {
   return isSoftwareGL();
 }
 /**
- * The hero intro is one WebGL context with its own phone budget (lite shader, capped pixel ratio), so any real GPU can
- * play it; only software WebGL (incl. Lighthouse), data saver and very weak devices (≤2 cores / ≤2 GB) get the still hero.
- * Phones usually report 4 cores / 4 GB, which `isLowEnd()` (used for the heavier site background) treats as low-end.
+ * The intro has its own rendering budget. CPU/RAM hints tune its quality, never exclude a phone with a real GPU.
+ * The heavier site background still uses isLowEnd(); software WebGL and Data Saver keep the still artwork.
  */
 export function canPlayIntro() {
   if (!isBrowser) return false;
   if (forceGL()) return true;
-  const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+  const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
   if (nav.connection?.saveData) return false;
-  if ((nav.hardwareConcurrency ?? 8) <= 2) return false;
-  if ((nav.deviceMemory ?? 8) <= 2) return false;
   return !isSoftwareGL();
 }
 export function hasDebug() {

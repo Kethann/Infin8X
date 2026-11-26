@@ -7,6 +7,7 @@ import { prefersReducedMotion, isLowEnd } from '../lib/env';
 import { toolLogos } from '../content/toolLogos';
 import { SkillLogo, readable } from '../components/SkillLogo';
 import { SkillCloud } from '../components/SkillCloud';
+import { TransitionLink } from '../components/PageTransition';
 
 /** Counts up from 0 the first time it scrolls into view (final value at once with reduced motion). */
 function Count({ to }: { to: number }) {
@@ -131,7 +132,7 @@ export function Skills() {
 
         <div className="skills__footer" data-reveal>
           <p>{copy.footer}</p>
-          <a href="#projects">{copy.footerLink} <Icon name="arrow" size={14} /></a>
+          <TransitionLink to="/#projects">{copy.footerLink} <Icon name="arrow" size={14} /></TransitionLink>
         </div>
       </div>
     </section>

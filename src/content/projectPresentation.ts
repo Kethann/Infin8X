@@ -8,37 +8,37 @@ export interface ProjectPresentation {
 }
 export const projectPresentation: Record<string, ProjectPresentation> = {
   'kaaya-cafe': {
-    name: 'Kaaya', subtitle: 'From table to menu, with a scan.', light: '220 156 96',
-    statement: 'Ordering starts at the table.',
+    name: 'Kaaya', subtitle: 'A café & restaurant website.', light: '220 156 96',
+    statement: 'A little of the café, before you arrive.',
     notes: [
-      {label:'At the table',text:'Guests scan a QR code to open the menu on their phone.'},
-      {label:'Made for mobile',text:'A mobile layout guides guests through browsing the menu and placing an order.'},
-      {label:'A warmer interface',text:'Coffee tones and generous spacing give the menu a warm, readable feel.'},
-      {label:'The foundation',text:'React, QR access and a mobile-first approach define the project’s scope.'},
+      {label:'The place',text:'A website for Kaaya, a café and restaurant.'},
+      {label:'The direction',text:'Bring the character of a physical place into its online presence.'},
+      {label:'A warmer welcome',text:'Hospitality shapes the visual direction: inviting, personal and easy to explore.'},
+      {label:'The focus',text:'Café and restaurant identity, web design and a mobile-first experience.'},
     ],
   },
   'dolly-design-studio': {
-    name: 'Dolly', subtitle: 'Posters, title design, typography and logos.', light: '214 160 92',
-    statement: 'The cover page of cinema.',
+    name: 'Dolly', subtitle: 'An agency portfolio website.', light: '214 160 92',
+    statement: 'An agency introduced through its work.',
     notes: [
-      {label:'The studio',text:'Dolly Design Studio specialises in film publicity and title design.'},
+      {label:'The agency',text:'An agency portfolio for Dolly Design Studio, presenting its creative work.'},
       {label:'Cinema first',text:'The site presents the studio as the cover page of a book called Cinema.'},
       {label:'Gold on maroon',text:'A gold marquee logo and drifting stars give the site a classic film mood.'},
       {label:'The foundation',text:'Web design, portfolio structure and SEO form the project’s focus.'},
     ],
   },
   'unicre8': {
-    name: 'UC8', subtitle: 'Marketing, content and web in one place.', light: '240 132 52',
+    name: 'UC8', subtitle: 'A digital marketing agency website.', light: '240 132 52',
     statement: 'Make the brand stop the scroll.',
     notes: [
-      {label:'The studio',text:'UniCre8 is a digital marketing, content and web studio.'},
+      {label:'The agency',text:'UniCre8 is a digital marketing agency, bringing marketing, content and web together.'},
       {label:'One place',text:'From shoots and edits to design and the website, the brand’s work is handled in one place.'},
-      {label:'The work table',text:'A filterable work table presents the studio’s client projects.'},
-      {label:'The foundation',text:'Web design, development and motion for the studio’s own site.'},
+      {label:'The work table',text:'A filterable work table presents the agency’s client projects.'},
+      {label:'The foundation',text:'Web design, development and motion for the agency’s own site.'},
     ],
   },
   'ka': {
-    name: 'KA', subtitle: 'Ideas, unfolded.', light: '232 88 64',
+    name: 'KA', subtitle: 'A creative portfolio website.', light: '232 88 64',
     statement: 'Visual stories. Crafted with intention.',
     notes: [
       {label:'Art meets engineering',text:'Graphic design, UI/UX, full-stack apps and robotics, presented in one portfolio.'},

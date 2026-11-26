@@ -185,6 +185,63 @@
 @media (prefers-contrast: more) { .nav::before { display: none; } .nav__pill::before { background: #0d1422; backdrop-filter: none; box-shadow: inset 0 0 0 1px #bcc8d9; } .nav__bar, .nav__sheet { background: #0d1422 !important; backdrop-filter: none; box-shadow: inset 0 0 0 1px #bcc8d9; } .nav__links a { color: #f5f5f7; } }
 @media (prefers-reduced-motion: reduce) { .nav::before, .nav__pill::before, .nav__links a::after, .nav__cta::after { transition: none; } .nav__links a, .nav__links a span, .nav__brand, .nav__sheet li, .nav__sheet-cta { transition: none; animation: none; } }
 
+/* phones / tablets: like desktop, no glass bar. The wordmark stands alone (smaller) over its navy streak from the
+   screen's left edge, and the menu is its own small round glass button, always at the top right (also over the hero). */
+@media (max-width: 999px) {
+  .nav { padding-top: calc(8px + env(safe-area-inset-top, 0px)); }
+  .nav__bar, .nav.is-scrolled .nav__bar, .nav.is-open .nav__bar, .nav.is-hero .nav__bar {
+    grid-template-columns: minmax(0, 1fr) 40px; gap: 10px; padding: 2px 0 2px 2px; border-radius: 0; overflow: visible;
+    background: none; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none; }
+  .nav__bar::before { top: 2px; bottom: 2px; left: calc(-1 * max(var(--gutter), env(safe-area-inset-left, 0px)) - 30px); width: 230px; }
+  .nav__brand { min-height: 40px; }
+  .nav__brand .brand-wordmark { font-size: 19px; }
+  .nav__toggle { width: 40px; height: 40px; border-radius: 50%; gap: 5px;
+    background: linear-gradient(180deg, rgba(231,240,255,.1), rgba(255,255,255,.02) 55%), rgba(9,14,25,.66);
+    -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 0 0 1px rgba(221,234,255,.1), 0 8px 20px -10px rgba(0,0,0,.7); }
+  .nav__toggle i { width: 16px; }
+  .nav.is-open .nav__toggle i:first-of-type { transform: translateY(3.25px) rotate(45deg); }
+  .nav.is-open .nav__toggle i:last-of-type { transform: translateY(-3.25px) rotate(-45deg); }
+  .nav__sheet { top: calc(60px + env(safe-area-inset-top, 0px)); max-height: calc(100dvh - 76px - env(safe-area-inset-top, 0px)); }
+  .lowend .nav__toggle { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(9,14,25,.9); }
+  /* no glass bar behind the wordmark any more: a slightly deeper top fade keeps scrolling copy out of its way */
+  body::before { height: 88px; background: linear-gradient(180deg, rgba(2,5,13,.94), rgba(2,5,13,.66) 50%, transparent); }
+}
+
+/* phones (≥360px) and tablets: the section icons replace the menu. Wordmark left, one compact glass pill right with
+   an icon per section and the round contact button; buttons scale with the screen (--b). The current section is a lit
+   puck in its accent that glides between icons (one transform, no layout change, so no flicker). Narrower screens keep
+   the menu sheet. */
+@media (min-width: 360px) and (max-width: 999px) {
+  .nav__bar, .nav.is-scrolled .nav__bar, .nav.is-open .nav__bar, .nav.is-hero .nav__bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .nav__toggle, .nav__sheet { display: none !important; }
+  .nav__pill { --b: clamp(30px, calc((100vw - 2 * var(--gutter) - 142px) / 6), 40px); --g: 2px;
+    position: relative; display: flex; align-items: center; gap: var(--g); padding: 3px; border-radius: 999px; justify-self: end; isolation: isolate;
+    background: linear-gradient(180deg, rgba(231,240,255,.1), rgba(255,255,255,.02) 55%), rgba(9,14,25,.68);
+    -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 0 0 1px rgba(221,234,255,.09), 0 8px 22px -12px rgba(0,0,0,.75); }
+  .nav__links { position: relative; display: flex; gap: var(--g); padding: 0; border-radius: 999px; background: none; box-shadow: none; }
+  /* the puck under the current section's icon */
+  .nav__links::before { content: ''; position: absolute; left: 0; top: 0; width: var(--b); height: var(--b); border-radius: 50%; z-index: 0; pointer-events: none;
+    transform: translate3d(calc(max(var(--k), 0) * (var(--b) + var(--g))), 0, 0); opacity: clamp(0, calc(var(--k) + 1), 1);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--nav-accent) 80%, #fff 8%), color-mix(in srgb, var(--nav-accent) 58%, #05070d));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 16px -6px color-mix(in srgb, var(--nav-accent) 85%, transparent);
+    transition: transform .55s var(--ease-out), background-color .45s, box-shadow .45s, opacity .3s; }
+  .nav__links a { position: relative; z-index: 1; display: grid; place-items: center; width: var(--b); height: var(--b); padding: 0; border-radius: 50%; gap: 0;
+    color: #c9d1de; -webkit-tap-highlight-color: transparent; transition: color .35s; }
+  .nav__links a span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .nav__links a .icon { width: calc(var(--b) * .42); height: calc(var(--b) * .42); opacity: .8; }
+  .nav__links a[aria-current] { color: #fff; }
+  .nav__links a[aria-current] .icon { opacity: 1; color: #fff; }
+  .nav__links a:focus-visible, .nav__cta:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+  .nav__cta { display: grid; place-items: center; width: var(--b); height: var(--b); min-height: 0; padding: 0; border-radius: 50%; gap: 0;
+    color: #0b0f18; background: linear-gradient(165deg, #fff, #dfe6f1); box-shadow: inset 0 -1px 1px rgba(79,99,129,.3); }
+  .nav__cta .icon { width: calc(var(--b) * .42); height: calc(var(--b) * .42); }
+  .nav__cta-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .lowend .nav__pill { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(9,14,25,.92); }
+}
+@media (min-width: 360px) and (max-width: 999px) and (prefers-reduced-motion: reduce) { .nav__links::before { transition: none; } }
+
 /* ---------- chapter headers ---------- */
 .section[data-chapter] { scroll-margin-top: 32px; isolation: isolate; overflow-x: clip; }
 @media (max-width: 999px) { .section[data-chapter] { scroll-margin-top: 52px; } }
@@ -192,7 +249,7 @@
   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--section-accent) 85%, #fff), transparent) no-repeat, linear-gradient(90deg, transparent, rgba(204,218,240,.12) 20%, rgba(204,218,240,.12) 80%, transparent);
   background-size: 22% 100%, 100% 100%; animation: divider-flow 7s cubic-bezier(.45,0,.55,1) infinite; }
 @keyframes divider-flow { from { background-position: -30% 0, 0 0; } to { background-position: 130% 0, 0 0; } }
-.chapter { position: relative; max-width: 66rem; margin-bottom: clamp(32px, 4.5vw, 56px); }
+.chapter { position: relative; max-width: 66rem; margin-bottom: clamp(24px, 3.2vw, 44px); }
 .chapter--center { margin-inline: auto; text-align: center; }
 .chapter__title { position: relative; z-index: 1; max-width: 32ch; font-size: var(--fs-h2); line-height: 1.12; text-wrap: balance; color: #eef2fa; }
 /* the description under each section title: Manrope (open apertures, tall x-height) for clear reading; Unique is too thin here */
@@ -282,7 +339,7 @@
 .btn--primary:hover::after { transition: background-position .9s var(--ease-light); background-position: -30% 0; }
 
 /* ---------- footer: the finale ---------- */
-.footer { position: relative; z-index: 1; padding: clamp(48px, 5vw, 72px) 0 calc(28px + env(safe-area-inset-bottom, 0px)); overflow: hidden; }
+.footer { position: relative; z-index: 1; padding: clamp(36px, 4vw, 56px) 0 calc(28px + env(safe-area-inset-bottom, 0px)); overflow: hidden; }
 .footer__spectrum { position: absolute; left: 0; right: 0; top: 0; height: 1px; background-size: 200% 100% !important; animation: line-flow-f 9s linear infinite;
   background: linear-gradient(90deg, transparent, #fff 18%, var(--s-red) 36%, var(--s-orange) 46%, var(--s-yellow) 55%, var(--s-magenta) 64%, var(--s-blue) 74%, var(--s-violet) 84%, transparent);
   box-shadow: 0 0 22px rgba(160,190,255,.35); opacity: .7; }
@@ -324,27 +381,20 @@ body::before { top: 0; height: clamp(72px, 11vh, 110px); background: linear-grad
 body::after { bottom: 0; height: clamp(48px, 8vh, 84px); background: linear-gradient(0deg, rgba(2,5,13,.7), rgba(2,5,13,.3) 50%, transparent); }
 @media print { body::before, body::after { display: none; } }
 
-/* ---------- page scroll: no side scrollbar; progress runs edge to edge under the nav bar ---------- */
+/* ---------- page scroll: no side scrollbar; a soft spectrum hairline at the top of the screen ---------- */
 html { scrollbar-width: none; }
 html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
-/* White light enters at the left edge and disperses into the spectrum as the page is read (the prism story).
-   The gradient is laid over the full width and revealed by clip-path, so colours never stretch while it fills. */
-.nav__progress { --p: 0; position: absolute; left: 0; right: 0; top: 100%; margin-top: 9px; height: 3px; pointer-events: none;
+/* A hairline at the very top edge of the screen: white light enters at the left and disperses into the spectrum as
+   the page is read. The spectrum stays full width; an alpha mask feathers both ends and the lower edge. */
+.nav__progress { --p: 0; position: absolute; left: 0; right: 0; top: 0; height: 2px; pointer-events: none; overflow: hidden;
   opacity: 0; transition: opacity .6s var(--ease-out); }
 .nav.is-scrolled:not(.is-hero) .nav__progress { opacity: 1; }
-.nav__progress::before { content: ''; position: absolute; inset: 1px 0; background: linear-gradient(90deg, rgba(255,255,255,.1), rgba(160,190,255,.07) 40%, rgba(255,255,255,.03)); }
-.nav__progress i, .nav__progress::after { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--p) * 100%) 0 0);
-  background:
-    linear-gradient(90deg, transparent calc(var(--p) * 100% - 14%), rgba(255,255,255,.95) calc(var(--p) * 100% - 1.5%), transparent calc(var(--p) * 100%)),
-    linear-gradient(90deg, #fff 0%, #cfe6ff 9%, var(--s-blue) 22%, var(--s-violet) 38%, var(--s-magenta) 54%, var(--s-red) 70%, var(--s-orange) 85%, var(--s-yellow) 100%); }
-.nav__progress i { border-radius: 0 3px 3px 0; }
-/* the glow under the beam: same light, blurred, plus a moving glint along the lit part */
-.nav__progress::after { content: ''; inset: -3px 0; filter: blur(5px); opacity: .85; clip-path: inset(0 calc(100% - var(--p) * 100% - 6px) 0 0); }
-.nav__progress i::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent) 0 0 / 22% 100% no-repeat;
-  mix-blend-mode: overlay; animation: progress-glint 3.6s var(--ease-light, ease-in-out) infinite; }
-@keyframes progress-glint { from { background-position: -30% 0; } to { background-position: 130% 0; } }
-@media (prefers-reduced-motion: reduce) { .nav__progress i::after { animation: none; display: none; } }
-.lowend .nav__progress::after { display: none; }
+.nav__progress i { --fade: min(clamp(12px, 3vw, 48px), calc(var(--p) * 50%)); position: absolute; inset: 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(var(--p) * 100% - var(--fade)), transparent calc(var(--p) * 100%)), linear-gradient(180deg, #000 20%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(90deg, transparent, #000 var(--fade), #000 calc(var(--p) * 100% - var(--fade)), transparent calc(var(--p) * 100%)), linear-gradient(180deg, #000 20%, transparent);
+  mask-composite: intersect;
+  background: linear-gradient(90deg, rgba(255,255,255,.9), #cfe6ff 10%, var(--s-blue) 26%, var(--s-violet) 42%, var(--s-magenta) 58%, var(--s-red) 74%, var(--s-orange) 88%, var(--s-yellow)); }
 
 /* Skills is its own page: clear the fixed nav */
-.skills-page { min-height: 100vh; padding-top: clamp(76px, 9vw, 104px); }
+.skills-page { min-height: 100vh; padding-top: clamp(64px, 8vw, 96px); }

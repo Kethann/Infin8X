@@ -49,14 +49,21 @@ export function Nav({ home }: { home: boolean }) {
   }, [home]);
 
   const progressRef = useRef<HTMLDivElement>(null);
-  useEffect(() => onProgress((p) => {
-    progressRef.current?.style.setProperty('--p', p.toFixed(4));
-    const s = window.scrollY > 40;
-    setScrolled((v) => (v === s ? v : s));
+  useEffect(() => {
     const hero = home ? document.getElementById('top') : null;
-    const h = !!hero && hero.getBoundingClientRect().bottom > window.innerHeight * 0.3;
-    setInHero((v) => (v === h ? v : h));
-  }), [home]);
+    let heroEnd = 0, previousScrolled: boolean | undefined, previousHero: boolean | undefined;
+    const measure = () => { heroEnd = hero ? hero.getBoundingClientRect().bottom + scrollY : 0; };
+    measure();
+    const observer = hero ? new ResizeObserver(measure) : null;
+    if (hero) observer?.observe(hero);
+    const unsubscribe = onProgress((p) => {
+      progressRef.current?.style.setProperty('--p', p.toFixed(4));
+      const s = scrollY > 40, h = !!hero && heroEnd - scrollY > innerHeight * 0.3;
+      if (s !== previousScrolled) { previousScrolled = s; setScrolled(s); }
+      if (h !== previousHero) { previousHero = h; setInHero(h); }
+    });
+    return () => { unsubscribe(); observer?.disconnect(); };
+  }, [home]);
 
   useEffect(() => {
     if (!open) return;

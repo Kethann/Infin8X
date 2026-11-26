@@ -18,7 +18,8 @@ Search the code for `[PLACEHOLDER` and `[CONFIRM` to find every instance. All co
 
 ## Projects (`projects.ts`), every project needs `[CONFIRM public / permission]`
 For each of Kaaya Cafe (kaayacafe.pages.dev), Dolly Design Studio, UniCre8 (uc8.vercel.app, cover from a site screenshot) and KA (kethan.pages.dev); Dolly is dollydstudio.pages.dev. All four covers are screenshots of the live sites:
-- [ ] UniCre8 / KA: confirm tags (seeded as Web design / Development / Motion, Portfolio / Motion / Development)
+- Confirmed project types: Kaaya — café & restaurant website; Dolly — agency portfolio website; UC8 — digital marketing agency website; KA — creative portfolio website. These apply to both the gallery and individual project pages.
+- [ ] UniCre8 / KA: confirm tags (Digital marketing / Web design / Development, Portfolio / Motion / Development)
 - [ ] Permission to show publicly
 - [ ] Cover image (16:10, ≥ 1600 px wide, put in `public/work/` and set `cover`)
 - [ ] One-line outcome

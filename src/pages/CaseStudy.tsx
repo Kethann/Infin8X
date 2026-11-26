@@ -60,7 +60,7 @@ export function CaseStudy({ slug }: { slug: string }) {
         <section id="project-overview" className="case__overview" aria-labelledby="overview-title">
           <div className="case__section-label"><span>01</span> / OVERVIEW</div>
           <div className="case__overview-body"><h2 id="overview-title">{view.statement}</h2><p>{p.summary}</p></div>
-          <dl className="case__facts"><div><dt>Discipline</dt><dd>{p.category}</dd></div><div><dt>Focus & tools</dt><dd><ul>{p.tags.map(t => <li key={t}>{t}</li>)}</ul></dd></div><div><dt>Presentation</dt><dd>{p.cover ? 'Project overview' : 'Concept & visual exploration'}</dd></div></dl>
+          <dl className="case__facts"><div><dt>Discipline</dt><dd>{p.discipline}</dd></div><div><dt>Focus & tools</dt><dd><ul>{p.tags.map(t => <li key={t}>{t}</li>)}</ul></dd></div><div><dt>Presentation</dt><dd>{p.cover ? 'Project overview' : 'Concept & visual exploration'}</dd></div></dl>
         </section>
         <section className="case__direction" aria-labelledby="direction-title">
           <div className="case__section-label"><span>02</span> / PROJECT NOTES</div>

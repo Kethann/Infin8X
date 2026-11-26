@@ -23,37 +23,46 @@ const accentOf = (el: HTMLElement) => getComputedStyle(el).getPropertyValue('--s
 
 /** Starts tracking; returns a cleanup. Call once per route. */
 export function trackChapters() {
-  let raf = 0, line = 0;
-  const els = () => [...document.querySelectorAll<HTMLElement>('[data-chapter]')];
-  const measure = () => {
-    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
-    const marks = els().map((el) => ({
-      id: el.dataset.chapter!, label: el.dataset.chapterLabel ?? el.dataset.chapter!, accent: accentOf(el),
-      at: Math.min(1, Math.max(0, (el.getBoundingClientRect().top + scrollY - innerHeight * 0.45) / max)),
-    }));
-    emit({ marks });
-    update();
-  };
+  let raf = 0, dirty = true, disposed = false, max = 1;
+  let chapters: (Mark & { top: number; bottom: number })[] = [];
   const update = () => {
     raf = 0;
-    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
-    progress = Math.min(1, Math.max(0, scrollY / max));
+    if (disposed) return;
+    const y = scrollY, line = y + innerHeight * 0.45;
+    const next: Partial<State> = {};
+    // Cache layout on resize/content changes. Ordinary scroll frames read only the scroll offset.
+    if (dirty) {
+      dirty = false;
+      max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-chapter]'), el => {
+        const rect = el.getBoundingClientRect(), top = rect.top + y;
+        return { id: el.dataset.chapter!, label: el.dataset.chapterLabel ?? el.dataset.chapter!, accent: accentOf(el),
+          top, bottom: rect.bottom + y, at: Math.min(1, Math.max(0, (top - innerHeight * 0.45) / max)) };
+      });
+      next.marks = chapters.map(({ id, label, accent, at }) => ({ id, label, accent, at }));
+    }
+    progress = Math.min(1, Math.max(0, y / max));
     progressListeners.forEach((f) => f(progress));
-    line = innerHeight * 0.45;
-    let active: HTMLElement | null = null;
-    for (const el of els()) { const r = el.getBoundingClientRect(); if (r.top <= line && r.bottom > line) { active = el; break; } }
-    const id = active?.dataset.chapter ?? null;
-    if (id !== state.id) emit({ id, accent: active ? accentOf(active) : DEFAULT_ACCENT });
+    const active = chapters.find(chapter => chapter.top <= line && chapter.bottom > line);
+    const id = active?.id ?? null, accent = active?.accent ?? DEFAULT_ACCENT;
+    if (id !== state.id || accent !== state.accent) Object.assign(next, { id, accent });
+    if (Object.keys(next).length) emit(next);
   };
   const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+  const measure = () => { if (!disposed) { dirty = true; onScroll(); } };
   const ro = new ResizeObserver(() => measure());
   ro.observe(document.body);
+  const mo = new MutationObserver(measure);
+  mo.observe(document.getElementById('main') ?? document.body, { childList: true, subtree: true });
+  document.fonts?.ready.then(measure);
+  document.fonts?.addEventListener('loadingdone', measure);
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', measure);
   addEventListener('infin8x:sections-ready', measure);
   measure();
   return () => {
-    cancelAnimationFrame(raf); ro.disconnect();
+    disposed = true; cancelAnimationFrame(raf); ro.disconnect(); mo.disconnect();
+    document.fonts?.removeEventListener('loadingdone', measure);
     removeEventListener('scroll', onScroll); removeEventListener('resize', measure); removeEventListener('infin8x:sections-ready', measure);
     emit({ id: null, accent: DEFAULT_ACCENT, marks: [] });
   };

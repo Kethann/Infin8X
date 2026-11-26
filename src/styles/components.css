@@ -43,7 +43,7 @@
 #main, .footer { position: relative; z-index: 1; }
 
 /* ================= SECTIONS ================= */
-.section { position: relative; padding-block: clamp(48px, 5vw, 72px); }
+.section { position: relative; padding-block: clamp(36px, 4vw, 56px); }
 .todo-note { margin-top: 28px; color: #8c8ca0; font-size: .6875rem; letter-spacing: .08em; text-transform: none; }
 .todo-inline { color: #b8a25a; font-size: .85em; letter-spacing: .02em; text-transform: none; }
 .link-arrow { display: inline-flex; gap: .4em; align-items: center; color: var(--c-text); border-bottom: 1px solid color-mix(in srgb, var(--section-accent) 60%, transparent); padding-bottom: 2px; transition: border-color .3s, color .3s; }

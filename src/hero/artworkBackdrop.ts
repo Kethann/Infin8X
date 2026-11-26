@@ -8,7 +8,10 @@ import formationPath from '../brand/formationPath.json';
 
 /** Rounded solid ribbons preserve the source outline and share pigment across every side. */
 export async function createArtworkBackdrop(canvas: HTMLCanvasElement, reduced: boolean, stage: HTMLElement) {
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+  // Limited hardware gets the same intro story at a smaller rendering cost, including phones that report only 2 GB.
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  const constrained = (nav.hardwareConcurrency ?? 8) <= 2 || (nav.deviceMemory ?? 8) <= 2;
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !constrained, powerPreference: 'high-performance' });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1;
@@ -17,7 +20,7 @@ export async function createArtworkBackdrop(canvas: HTMLCanvasElement, reduced: 
   const room = new RoomEnvironment(), pmrem = new THREE.PMREMGenerator(renderer);
   const environment = pmrem.fromScene(room, 0.04); room.dispose(); pmrem.dispose();
   scene.environment = environment.texture;
-  const aurora = createAuroraCurtain(isTouch() || innerWidth < 768);
+  const aurora = createAuroraCurtain(constrained || isTouch() || innerWidth < 768);
   const resources: {dispose():void}[] = [environment, aurora];
   const dispose = () => { resources.forEach(r=>r.dispose()); renderer.dispose(); };
   try {
@@ -101,8 +104,8 @@ export async function createArtworkBackdrop(canvas: HTMLCanvasElement, reduced: 
       const rect=canvas.getBoundingClientRect(), target=stage.getBoundingClientRect();
       width=Math.max(rect.width,1); height=Math.max(rect.height,1);
       // Bound the render buffer on Retina phones and large external displays.
-      const pixelBudget=isTouch() ? 2_500_000 : 5_000_000;
-      renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2, Math.sqrt(pixelBudget/(width*height))));
+      const pixelBudget=constrained ? 800_000 : isTouch() ? 2_500_000 : 5_000_000;
+      renderer.setPixelRatio(Math.min(devicePixelRatio || 1, constrained ? 1 : 2, Math.sqrt(pixelBudget/(width*height))));
       renderer.setSize(width,height,false);
       camera.aspect=width/height; camera.position.z=height/(2*Math.tan(THREE.MathUtils.degToRad(13))); camera.updateProjectionMatrix();
       camera.updateMatrixWorld();
