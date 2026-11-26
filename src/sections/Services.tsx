@@ -14,8 +14,9 @@ const MOVE_MS = 550;
 
 /**
  * Four service cards: icon + name, outcome, animated scene, points, contact link. One row on desktop, 2×2 on tablets.
- * Phones show small square cards (icon, name, scene); tapping one widens it across the row to reveal its outcome and
- * points, and the card beside it glides down to the next row (FLIP: every card animates from where it was).
+ * Phones show small square cards (icon, name, scene), two per row. Tapping one opens it across the top row (outcome,
+ * points, a full-width scene) and the other three tuck into one compact row of mini cards right under it. Every card
+ * glides from where it was (FLIP): moving or shrinking cards translate + scale, the growing card reveals its new size.
  */
 export function Services() {
   const grid = useRef<HTMLDivElement>(null);
@@ -64,12 +65,17 @@ export function Services() {
       const now = c.getBoundingClientRect(), was = old[i];
       const dx = was.left - now.left, dy = was.top - now.top;
       const grew = now.width > was.width + 1 || now.height > was.height + 1;
-      const frames: Keyframe[] = [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0, 0)' }];
+      const sx = was.width / now.width, sy = was.height / now.height;
+      let frames: Keyframe[];
       if (grew) {
-        frames[0].clipPath = `inset(0 ${Math.max(0, now.width - was.width)}px ${Math.max(0, now.height - was.height)}px 0 round 26px)`;
-        frames[1].clipPath = 'inset(0 0 0 0 round 26px)';
+        // the growing card stays sharp: it starts clipped to its old box and opens to its new one
+        frames = [{ transform: `translate(${dx}px, ${dy}px)`, clipPath: `inset(0 ${Math.max(0, now.width - was.width)}px ${Math.max(0, now.height - was.height)}px 0 round 26px)` },
+          { transform: 'translate(0, 0)', clipPath: 'inset(0 0 0 0 round 26px)' }];
+      } else {
+        frames = [{ transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, transformOrigin: '0 0' }, { transform: 'translate(0, 0) scale(1, 1)', transformOrigin: '0 0' }];
       }
-      if (dx || dy || grew) c.animate(frames, { duration: MOVE_MS, easing: EASE });
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5 || grew || Math.abs(sx - 1) > 0.01 || Math.abs(sy - 1) > 0.01)
+        c.animate(frames, { duration: MOVE_MS, easing: EASE });
     });
     if (open !== null) {
       const el = cards.current[open];
@@ -82,11 +88,11 @@ export function Services() {
       style={{ '--section-accent': accentVar(services.accent) } as CSSProperties} aria-labelledby="services-h">
       <div className="page">
         <Chapter id="services" titleId="services-h" title={services.title} lead={services.lead} />
-        <div ref={grid} className="svc-grid">
+        <div ref={grid} className="svc-grid" data-open={phone && open !== null ? '' : undefined}>
           {services.items.map((s, i) => {
             const isOpen = phone && open === i;
-            // the open card leads its pair, so the card beside it is the one that moves down
-            const order = isOpen ? (i - (i % 2)) * 10 - 1 : i * 10;
+            // the open card takes the top row; the others keep their order in the compact row below
+            const order = isOpen ? -1 : i;
             return (
               <article key={s.name} ref={(el) => { cards.current[i] = el; }} className={`svc${isOpen ? ' is-open' : ''}`} data-light data-reveal
                 aria-labelledby={`service-${s.icon}`} style={{ '--c': accentVar(s.accent), order } as CSSProperties}>

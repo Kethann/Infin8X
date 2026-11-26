@@ -109,8 +109,10 @@
    down whole with zoom, never cropped), the name under the icon, and "Discuss your project" as a round arrow button in the corner (its full
    name stays in aria-label). The longer copy (outcome, points) is for tablets and up. */
 @media (min-width: 360px) and (max-width: 639px) {
-  .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .svc { aspect-ratio: 1; padding: 12px; border-radius: 26px; justify-content: space-between; }
+  /* six tracks: a square card spans three (two per row); with a card open it takes the full top row and the other
+     three span two each, one compact row right under it */
+  .svc-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  .svc { grid-column: span 3; aspect-ratio: 1; padding: 12px; border-radius: 26px; justify-content: space-between; }
   .svc__top { flex-direction: column; align-items: flex-start; gap: 6px; margin: 0; }
   .svc__icon { width: 28px; height: 28px; border-radius: 9px; }
   .svc__icon .icon { width: 15px; height: 15px; }
@@ -122,23 +124,34 @@
   .svc__link span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .svc__link .icon { flex: 0 0 auto; width: 14px; height: 14px; }
 }
-/* phones: a tap widens the card across the row (it leads its pair, the card beside it moves down; the movement is a
-   FLIP animation in Services.tsx) and reveals the outcome and the points */
+/* phones: a tap opens the card across the top row (outcome, points, a scene scaled up to fill the width) and the
+   other three become mini cards in one row under it; the movement is a FLIP animation in Services.tsx */
 .svc__more { display: none; }
 @media (min-width: 360px) and (max-width: 639px) {
   .svc__more { display: block; position: absolute; inset: 0; z-index: 1; padding: 0; border-radius: inherit; background: none; cursor: pointer;
     -webkit-tap-highlight-color: transparent; }
   .svc__more:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
   .svc__link { z-index: 2; }
-  .svc.is-open { grid-column: 1 / -1; aspect-ratio: auto; justify-content: flex-start; }
+  /* the open card */
+  .svc.is-open { grid-column: 1 / -1; aspect-ratio: auto; justify-content: flex-start; padding: 14px 14px 12px; }
   .svc.is-open .svc__top { flex-direction: row; align-items: center; gap: 10px; padding-right: 36px; }
   .svc.is-open h3 { font-size: .9375rem; }
   .svc.is-open .svc__outcome { display: block; margin: 8px 0 10px; font-size: .8125rem; line-height: 1.45; animation: svc-more .5s .18s var(--ease-out) both; }
-  .svc.is-open .scene { zoom: .72; }
-  .svc.is-open .svc__points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; margin: 10px 0 2px;
+  /* the scene is drawn for a ~270px card: scale it up (zoom > 1) so the drawing fills the wide card, not half of it */
+  .svc.is-open .scene { zoom: 1.12; height: 100px; border-radius: 12px; }
+  .svc.is-open .svc__points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; margin: 12px 0 2px;
     animation: svc-more .5s .26s var(--ease-out) both; }
   .svc.is-open .svc__points li { gap: 6px; font-size: .78rem; line-height: 1.35; }
   .svc.is-open .svc__points li::before { flex-basis: 4px; width: 4px; height: 4px; }
+  /* the other three: mini cards, one row */
+  .svc-grid[data-open] .svc:not(.is-open) { grid-column: span 2; padding: 9px; border-radius: 20px; }
+  .svc-grid[data-open] .svc:not(.is-open) .svc__top { gap: 5px; }
+  .svc-grid[data-open] .svc:not(.is-open) .svc__icon { width: 22px; height: 22px; border-radius: 7px; }
+  .svc-grid[data-open] .svc:not(.is-open) .svc__icon .icon { width: 12px; height: 12px; }
+  .svc-grid[data-open] .svc:not(.is-open) h3 { font-size: .6875rem; line-height: 1.2; }
+  .svc-grid[data-open] .svc:not(.is-open) .scene { zoom: .4; border-radius: 26px; }
+  .svc-grid[data-open] .svc:not(.is-open) .svc__link { top: 9px; right: 9px; width: 22px; height: 22px; }
+  .svc-grid[data-open] .svc:not(.is-open) .svc__link .icon { width: 11px; height: 11px; }
 }
 @keyframes svc-more { from { opacity: 0; transform: translateY(6px); } }
 @media (prefers-reduced-motion: reduce) { .svc.is-open .svc__outcome, .svc.is-open .svc__points { animation: none; } }

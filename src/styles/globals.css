@@ -222,8 +222,11 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing:
   .hero--exact { min-height: clamp(640px, 84svh, 960px); }
 }
 @media (max-width: 767px) {
-  .hero--exact { min-height: clamp(560px, 78svh, 740px); --hero-artwork-width: min(90vw, 640px);
-    --hero-artwork-top: clamp(136px, 22svh, 204px); }
+  /* phones: the hero fills the screen and its block (logo, wordmark, lines, actions ≈ 330px) sits centred under the nav */
+  .hero--exact { min-height: max(520px, 100svh); --hero-artwork-width: min(90vw, 640px);
+    --hero-artwork-top: clamp(104px, calc(50svh - 150px), 250px); }
+  /* the crossing-offset is a few px at this size and reads as a misalignment against the centred text: centre it */
+  .hero__brand { left: 0; }
   .hero__details { max-width: 440px; }
   .hero--exact .hero__ctas { gap: 10px; max-width: 360px; margin-inline: auto; }
   .hero--exact .hero__ctas .btn { flex: 1 1 auto; min-width: 0; padding: 12px 14px; font-size: .875rem; white-space: nowrap; }
