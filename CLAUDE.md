@@ -67,7 +67,13 @@ Scripts use `/usr/bin/google-chrome` (override with `CHROME=`). Headless Chrome 
 nginx (`docker/nginx.conf`: SPA fallback, long cache for hashed assets). The Cloudflare contact function does not run there; the
 form falls back to email / LinkedIn.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers, current project)
+The Cloudflare project is a **Worker** (deploy command `npx wrangler deploy`). `wrangler.jsonc` serves `dist/` as static assets with
+SPA fallback, and `worker/index.ts` routes `/api/contact` to the handler in `functions/api/contact.ts`. Without `wrangler.jsonc`,
+Wrangler tries to configure Vite automatically and fails on Vite 5. Set `RESEND_API_KEY` / `CONTACT_TO` / `CONTACT_FROM` under the
+Worker's Settings → Variables and Secrets. Check locally with `npx wrangler deploy --dry-run`.
+
+## Deploy (Cloudflare Pages, alternative)
 Build command `npm run build`, output `dist`. Functions in `functions/` deploy automatically.
 Set env vars `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM` for the contact form. Without them the form falls back to `mailto:`.
 Update `siteUrl` in `src/content/site.ts`, `index.html` meta, `public/robots.txt` and `public/sitemap.xml` once the real domain is known.
