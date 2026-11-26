@@ -18,5 +18,7 @@ export const brand = {
 import { chapters } from './sections';
 
 /** Primary navigation = every chapter except Contact, which has its own call-to-action button. */
-export const nav = chapters.filter((c) => c.id !== 'contact').map((c) => ({ href: `#${c.id}`, label: c.label, id: c.id }));
+/** Skills is its own page (`/skills`); every other entry is a section on home. */
+export const chapterHref = (id: string) => (id === 'skills' ? '/skills' : `#${id}`);
+export const nav = chapters.filter((c) => c.id !== 'contact').map((c) => ({ href: chapterHref(c.id), label: c.label, id: c.id }));
 export const navCta = brand.projectCta;

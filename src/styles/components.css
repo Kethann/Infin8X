@@ -36,8 +36,8 @@
 @media (prefers-reduced-motion: reduce) { .glass { transform: none !important; } }
 /* Low-end devices skip per-frame repaints of translucent surfaces. */
 .lowend .hero__hint i::after { animation: none !important; }
-.lowend .hero__code, .lowend .hero__gl, .lowend .hero__space, .lowend .hero::after { display: none !important; }
-.lowend .hero, .lowend body { background: #020611; }
+.lowend .hero--lite .hero__code, .lowend .hero--lite .hero__gl, .lowend .hero--lite .hero__space, .lowend .hero--lite::after { display: none !important; }
+.lowend .hero--lite, .lowend body { background: #020611; }
 .lowend .glass { transition: none; transform: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background-color: rgba(24,24,36,.86) !important; }
 
 #main, .footer { position: relative; z-index: 1; }

@@ -1,10 +1,15 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
-import { nav, navCta, brand } from '../content/site';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { nav, navCta, brand, chapterHref } from '../content/site';
 import { chapters } from '../content/sections';
 import { BrandWordmark } from './BrandWordmark';
 import { Icon } from './Icon';
 import { TransitionLink } from './PageTransition';
 import { useChapters, onProgress } from '../lib/chapters';
+
+/** In-page anchors on home stay plain links (Lenis glides to them); routes and cross-page jumps get the transition. */
+function Go({ to, children, ...rest }: { to: string; children: ReactNode; [k: string]: unknown }) {
+  return to.startsWith('#') ? <a href={to} {...rest}>{children}</a> : <TransitionLink to={to} {...rest}>{children}</TransitionLink>;
+}
 
 /**
  * Shared brand wordmark and chapter navigation. Desktop: the wordmark on the left and one compact glass pill on the
@@ -43,7 +48,9 @@ export function Nav({ home }: { home: boolean }) {
     return () => { window.removeEventListener('infin8x:intro-done', on); clearTimeout(t); };
   }, [home]);
 
-  useEffect(() => onProgress(() => {
+  const progressRef = useRef<HTMLDivElement>(null);
+  useEffect(() => onProgress((p) => {
+    progressRef.current?.style.setProperty('--p', p.toFixed(4));
     const s = window.scrollY > 40;
     setScrolled((v) => (v === s ? v : s));
     const hero = home ? document.getElementById('top') : null;
@@ -72,7 +79,7 @@ export function Nav({ home }: { home: boolean }) {
     return () => { document.body.style.overflow = previous; background.forEach((el, i) => { el.inert = previousInert[i]; }); window.removeEventListener('keydown', escape); };
   }, [open]);
 
-  const href = (h: string) => (home ? h : `/${h}`);
+  const href = (h: string) => (h.startsWith('/') || home ? h : `/${h}`);
   // capsule = left pad 14 + icon 16 + gap 9 + label + right pad 16; 42 = a round icon button
   const k = nav.findIndex((n) => n.id === active);
   const capOf = (i: number) => 55 + (labelW[i] ?? 76);
@@ -93,31 +100,34 @@ export function Nav({ home }: { home: boolean }) {
           <span ref={measureRef} className="nav__measure" aria-hidden="true">{nav.map((n) => <span key={n.id}>{n.label}</span>)}</span>
           <nav aria-label="Primary" className="nav__links" style={linkVars}>
             {nav.map((n, i) => (
-              <a key={n.href} data-id={n.id} data-label={n.label} href={href(n.href)} aria-current={active === n.id ? 'location' : undefined}
+              <Go key={n.href} data-id={n.id} data-label={n.label} to={href(n.href)} aria-current={active === n.id ? 'location' : undefined}
                 style={{ '--i': i, '--w': `${labelW[i] ?? 76}px` } as CSSProperties}>
                 <Icon name={`nav-${n.id}`} size={16} /><span>{n.label}</span>
-              </a>
+              </Go>
             ))}
           </nav>
-          <a className="nav__cta" href={href('#contact')} data-label={navCta}><Icon name="nav-contact" size={16} /><span className="nav__cta-label">{navCta}</span></a>
+          <Go className="nav__cta" to={href('#contact')} data-label={navCta}><Icon name="nav-contact" size={16} /><span className="nav__cta-label">{navCta}</span></Go>
           <button type="button" className="nav__toggle" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>
             <span className="sr-only">{open ? 'Close menu' : 'Open menu'}</span><i /><i />
           </button>
         </div>
       </div>
 
+      {/* scroll progress, edge to edge under the bar: white light enters at the left and disperses into the spectrum */}
+      <div ref={progressRef} className="nav__progress" aria-hidden="true"><i /></div>
+
       <div id="mobile-menu" className="nav__sheet" hidden={!open}>
         <ol>
           {chapters.map((c, i) => (
             <li key={c.id} style={{ '--i': i, '--k': `var(--s-${c.accent})` } as CSSProperties}>
-              <a href={href(`#${c.id}`)} aria-current={active === c.id ? 'location' : undefined} onClick={() => setOpen(false)}>
+              <Go to={href(chapterHref(c.id))} aria-current={active === c.id ? 'location' : undefined} onClickCapture={() => setOpen(false)}>
                 <span className="nav__sheet-label">{c.label}</span>
                 <Icon name={`nav-${c.id}`} size={18} />
-              </a>
+              </Go>
             </li>
           ))}
         </ol>
-        <a className="btn btn--primary nav__sheet-cta" href={href('#contact')} onClick={() => setOpen(false)}>{navCta}</a>
+        <Go className="btn btn--primary nav__sheet-cta" to={href('#contact')} onClickCapture={() => setOpen(false)}>{navCta}</Go>
       </div>
     </header>
   );

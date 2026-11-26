@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { isLowEnd } from '../lib/env';
+import { canPlayIntro } from '../lib/env';
 import { useReducedMotion } from '../lib/useReducedMotion';
 import { brand } from '../content/site';
 import { WordmarkReveal } from '../components/WordmarkReveal';
@@ -27,7 +27,7 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
 
   useEffect(() => {
     const root = rootRef.current!, logo = logoRef.current!, stage = stageRef.current!;
-    const lite = isLowEnd();
+    const lite = !canPlayIntro();
     let disposed = false, visible = true, contextLost = false, raf = 0, last = performance.now();
     let backdrop: Awaited<ReturnType<typeof import('./artworkBackdrop').createArtworkBackdrop>> | undefined;
     let heroScroll=0;

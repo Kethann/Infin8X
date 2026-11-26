@@ -323,3 +323,28 @@ body::before, body::after { content: ''; position: fixed; left: 0; right: 0; z-i
 body::before { top: 0; height: clamp(72px, 11vh, 110px); background: linear-gradient(180deg, rgba(2,5,13,.82), rgba(2,5,13,.45) 45%, transparent); }
 body::after { bottom: 0; height: clamp(48px, 8vh, 84px); background: linear-gradient(0deg, rgba(2,5,13,.7), rgba(2,5,13,.3) 50%, transparent); }
 @media print { body::before, body::after { display: none; } }
+
+/* ---------- page scroll: no side scrollbar; progress runs edge to edge under the nav bar ---------- */
+html { scrollbar-width: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; width: 0; height: 0; }
+/* White light enters at the left edge and disperses into the spectrum as the page is read (the prism story).
+   The gradient is laid over the full width and revealed by clip-path, so colours never stretch while it fills. */
+.nav__progress { --p: 0; position: absolute; left: 0; right: 0; top: 100%; margin-top: 9px; height: 3px; pointer-events: none;
+  opacity: 0; transition: opacity .6s var(--ease-out); }
+.nav.is-scrolled:not(.is-hero) .nav__progress { opacity: 1; }
+.nav__progress::before { content: ''; position: absolute; inset: 1px 0; background: linear-gradient(90deg, rgba(255,255,255,.1), rgba(160,190,255,.07) 40%, rgba(255,255,255,.03)); }
+.nav__progress i, .nav__progress::after { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--p) * 100%) 0 0);
+  background:
+    linear-gradient(90deg, transparent calc(var(--p) * 100% - 14%), rgba(255,255,255,.95) calc(var(--p) * 100% - 1.5%), transparent calc(var(--p) * 100%)),
+    linear-gradient(90deg, #fff 0%, #cfe6ff 9%, var(--s-blue) 22%, var(--s-violet) 38%, var(--s-magenta) 54%, var(--s-red) 70%, var(--s-orange) 85%, var(--s-yellow) 100%); }
+.nav__progress i { border-radius: 0 3px 3px 0; }
+/* the glow under the beam: same light, blurred, plus a moving glint along the lit part */
+.nav__progress::after { content: ''; inset: -3px 0; filter: blur(5px); opacity: .85; clip-path: inset(0 calc(100% - var(--p) * 100% - 6px) 0 0); }
+.nav__progress i::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent) 0 0 / 22% 100% no-repeat;
+  mix-blend-mode: overlay; animation: progress-glint 3.6s var(--ease-light, ease-in-out) infinite; }
+@keyframes progress-glint { from { background-position: -30% 0; } to { background-position: 130% 0; } }
+@media (prefers-reduced-motion: reduce) { .nav__progress i::after { animation: none; display: none; } }
+.lowend .nav__progress::after { display: none; }
+
+/* Skills is its own page: clear the fixed nav */
+.skills-page { min-height: 100vh; padding-top: clamp(76px, 9vw, 104px); }

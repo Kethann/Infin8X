@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Route, Switch, useLocation } from 'wouter';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -6,6 +6,7 @@ import Lenis from 'lenis';
 import { Home } from './pages/Home';
 import { CaseStudy } from './pages/CaseStudy';
 import { DebugOverlay } from './pages/DebugOverlay';
+const SkillsPage = lazy(() => import('./pages/SkillsPage'));
 import { Nav } from './components/Nav';
 import { Footer } from './components/Footer';
 import { Wipe, takePendingSection } from './components/PageTransition';
@@ -160,6 +161,7 @@ export function App() {
       <main id="main" tabIndex={-1}>
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/skills"><Suspense fallback={<div className="skills-page" />}><SkillsPage /></Suspense></Route>
           <Route path="/work/:slug">{(p) => <CaseStudy key={p.slug} slug={p.slug} />}</Route>
           <Route><section className="section page case"><h1>Page not found</h1><a className="link-arrow" href="/">← Back home</a></section></Route>
         </Switch>

@@ -30,10 +30,10 @@ const tl = (idea: string, build: string, live: string) => [
 export const projects: Project[] = [
   { summary: 'A mobile ordering concept that takes café guests from a QR code to the menu.', slug: 'kaaya-cafe', name: 'Kaaya', discipline: 'QR ordering', title: 'Kaaya Cafe: QR ordering', category: 'Web', accent: 'orange',
     outcome: '[PLACEHOLDER: outcome, e.g. table orders without a waiter round-trip]',
-    tags: ['React', 'QR', 'Mobile-first'], cover: '', status: '[CONFIRM public / permission]',
+    tags: ['React', 'QR', 'Mobile-first'], cover: '/work/kaaya.webp', coverMobile: '/work/kaaya-mobile.webp', coverTablet: '/work/kaaya-tablet.webp', status: '[CONFIRM public / permission]',
     idea: 'Let guests scan a QR code at the table and order straight from their phone.',
     delivered: '[PLACEHOLDER: delivered result]',
-    timeline: tl('Scan, browse, order: no app install.', 'Mobile-first menu and ordering flow.', '[PLACEHOLDER: launch details]') },
+    timeline: tl('Scan, browse, order: no app install.', 'Mobile-first menu and ordering flow.', '[PLACEHOLDER: launch details]'), url: 'https://kaayacafe.pages.dev/' },
   { summary: 'The website for Dolly Design Studio, a film poster and title design studio.', slug: 'dolly-design-studio', name: 'Dolly', discipline: 'Studio website', title: 'Dolly Design Studio website', category: 'Web', accent: 'red',
     outcome: '[PLACEHOLDER: outcome]', tags: ['Web design', 'Portfolio', 'SEO'], cover: '/work/dolly.webp', coverMobile: '/work/dolly-mobile.webp', coverTablet: '/work/dolly-tablet.webp', status: '[CONFIRM public / permission]',
     idea: 'Present a film publicity studio’s posters, title design, typography and logos.', delivered: '[PLACEHOLDER: delivered result]',
