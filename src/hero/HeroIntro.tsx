@@ -24,6 +24,8 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
   const skipRef = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [rotationReady, setRotationReady] = useState(false);
+  // the mode is known before the first paint, so the flat artwork never flashes before the 3D canvas takes over
+  const [firstMode] = useState(() => (canPlayIntro() ? 'hero--artwork' : 'hero--lite'));
 
   useEffect(() => {
     const root = rootRef.current!, logo = logoRef.current!, stage = stageRef.current!;
@@ -154,7 +156,8 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
     const renderInteraction = () => { if (reduced && !contextLost) backdrop?.render(0,0); };
     const canRotate = () => !!backdrop && !contextLost && root.classList.contains('is-settled');
     const down = (event:PointerEvent) => {
-      if (!canRotate() || drag || !event.isPrimary || event.button!==0 || (event.target as Element).closest('button')) return;
+      // drag-to-rotate is a mouse/pen nicety; on touch it would fight page scrolling, so phones skip it
+      if (event.pointerType==='touch' || !canRotate() || drag || !event.isPrimary || event.button!==0 || (event.target as Element).closest('button')) return;
       if (event.pointerType === 'mouse') event.preventDefault();
       stage.focus({preventScroll:true});
       stage.setPointerCapture(event.pointerId);
@@ -230,7 +233,7 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
   }, [onIntroDone, reduced]);
 
   return (
-    <section ref={rootRef} id="top" className="hero hero--exact" aria-label="Infin8X introduction">
+    <section ref={rootRef} id="top" className={`hero hero--exact ${firstMode}`} aria-label="Infin8X introduction">
       <canvas ref={glRef} className="hero__gl" aria-hidden="true" />
       <h1 className="sr-only">{brand.name}: {brand.coreLine}</h1>
       <div ref={stageRef} className="hero__artwork-stage" role="group" aria-label="Interactive 3D infinity logo" aria-describedby="logo-rotation-help" tabIndex={rotationReady && !playing ? 0 : -1}>

@@ -222,9 +222,12 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing:
   .hero--exact { min-height: clamp(640px, 84svh, 960px); }
 }
 @media (max-width: 767px) {
-  /* phones: the hero fills the screen and its block (logo, wordmark, lines, actions ≈ 330px) sits centred under the nav */
-  .hero--exact { min-height: max(520px, 100svh); --hero-artwork-width: min(90vw, 640px);
-    --hero-artwork-top: clamp(104px, calc(50svh - 150px), 250px); }
+  /* phones: the hero is as tall as its content (no empty band under it); the caption gets room to breathe */
+  .hero--exact { min-height: 0; padding-bottom: 40px; --hero-artwork-width: min(90vw, 640px);
+    --hero-artwork-top: clamp(100px, calc(36svh - 100px), 200px); }
+  .hero__brand { margin-bottom: 18px; }
+  .hero--exact .hero__tagline { margin-top: 4px; }
+  .hero__summary { margin-top: 16px; }
   /* the crossing-offset is a few px at this size and reads as a misalignment against the centred text: centre it */
   .hero__brand { left: 0; }
   .hero__details { max-width: 440px; }
@@ -241,7 +244,9 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing:
 @media (prefers-reduced-motion: reduce) { .hero__original, .hero__artwork-stage { transform: none !important; } }
 
 /* The source image remains the accessible fallback and responsive sizing reference. */
-.hero--sculpture .hero__original { opacity: 0; }
+/* the 3D path draws the logo itself: the flat artwork stays hidden from the first paint (no flash, no pop); any
+   failure switches to .hero--lite, which shows it */
+.hero--sculpture .hero__original, .hero--artwork:not(.hero--lite) .hero__original { opacity: 0; }
 .hero--sculpture .hero__gl { z-index: 4; }
 .hero--sculpture .hero__artwork-stage { pointer-events: none; }
 .hero--sculpture.is-settled .hero__artwork-stage { z-index: 5; pointer-events: auto; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
