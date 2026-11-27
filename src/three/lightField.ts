@@ -194,7 +194,8 @@ float coc(float d){
   float near = smoothstep(uFocus, uFocus - 5.5, z) * 0.55;
   return clamp(max(far, near), 0.0, 1.0);
 }
-float hash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+// interleaved gradient noise: an even, fine-grained rotation per pixel (a white-noise hash read as blotchy, shimmering lines)
+float hash(vec2 p){ return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715)))); }
 vec3 aces(vec3 x){ return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
 void main(){
   vec2 uv = vUv;
@@ -222,10 +223,10 @@ precision highp float;
 uniform sampler2D uSrc; uniform vec2 uTexel; uniform float uThreshold;
 varying vec2 vUv;
 vec3 bp(vec2 o){ vec3 c = texture2D(uSrc, vUv + o * uTexel).rgb; float l = max(c.r, max(c.g, c.b)); return c * smoothstep(uThreshold, uThreshold + 0.35, l); }
+// quarter resolution: each output pixel covers a 4×4 block; four bilinear taps one texel from its centre average that
+// block exactly, so thin bright edges never flicker in and out (the old sparse taps aliased into pixelated glow)
 void main(){
-  vec3 c = bp(vec2(0.0)) * 0.2;
-  c += (bp(vec2(-1.5, -1.5)) + bp(vec2(1.5, -1.5)) + bp(vec2(-1.5, 1.5)) + bp(vec2(1.5, 1.5))) * 0.125;
-  c += (bp(vec2(-3.0, 0.0)) + bp(vec2(3.0, 0.0)) + bp(vec2(0.0, -3.0)) + bp(vec2(0.0, 3.0))) * 0.075;
+  vec3 c = (bp(vec2(-1.0, -1.0)) + bp(vec2(1.0, -1.0)) + bp(vec2(-1.0, 1.0)) + bp(vec2(1.0, 1.0))) * 0.25;
   gl_FragColor = vec4(c, 1.0);
 }`;
 const BLUR_FRAG = /* glsl */ `
@@ -494,6 +495,7 @@ export function startLightField(canvas: HTMLCanvasElement, opts: { quality: 'hig
     root.setProperty('--scene-light', `${Math.round(c.r / m * 255)} ${Math.round(c.g / m * 255)} ${Math.round(c.b / m * 255)}`);
     root.setProperty('--sun-x', `${((THREE.MathUtils.clamp(light.x, -1, 1) * 0.5 + 0.5) * 100).toFixed(1)}%`);
     root.setProperty('--sun-glow', (0.12 + 0.18 * light.day * (0.5 + 0.5 * light.elev)).toFixed(3));
+    root.setProperty('--sun-pos', (THREE.MathUtils.clamp(light.x, -1, 1) * 0.5 + 0.5).toFixed(3));   // 0 left … 1 right, for the nav's prism rim
   };
   function updateLight() {
     clockLight(hour, time, light);
@@ -530,13 +532,16 @@ export function startLightField(canvas: HTMLCanvasElement, opts: { quality: 'hig
     u.uT.value = time; u.uE.value = energy; u.uDim.value = dim; u.uAccent.value.copy(accent);
     renderer.setRenderTarget(rt); renderer.clear();
     renderer.render(scene, camera);
-    // bloom: bright pass to quarter res, then one wide horizontal + vertical gaussian blur
+    // bloom: bright pass to quarter res, then the gaussian twice (H, V, H, V) with contiguous taps: halos come out round
+    // and smooth (one pass with taps 1.6 texels apart spread small bright spots into blocky, square glows)
     passQuad.material = brightMat; renderer.setRenderTarget(bloomA); renderer.render(passScene, oCam);
     passQuad.material = blurMat;
-    blurMat.uniforms.uSrc.value = bloomA.texture; blurMat.uniforms.uDir.value.set(bloomTexel.x * 1.6, 0);
-    renderer.setRenderTarget(bloomB); renderer.render(passScene, oCam);
-    blurMat.uniforms.uSrc.value = bloomB.texture; blurMat.uniforms.uDir.value.set(0, bloomTexel.y * 1.6);
-    renderer.setRenderTarget(bloomA); renderer.render(passScene, oCam);
+    for (let pass = 0; pass < 2; pass++) {
+      blurMat.uniforms.uSrc.value = bloomA.texture; blurMat.uniforms.uDir.value.set(bloomTexel.x * 1.15, 0);
+      renderer.setRenderTarget(bloomB); renderer.render(passScene, oCam);
+      blurMat.uniforms.uSrc.value = bloomB.texture; blurMat.uniforms.uDir.value.set(0, bloomTexel.y * 1.15);
+      renderer.setRenderTarget(bloomA); renderer.render(passScene, oCam);
+    }
     renderer.setRenderTarget(null); renderer.clear();
     renderer.render(post, oCam);
     renderer.render(overlay, oCam);

@@ -1,6 +1,6 @@
 """Favicons from the hero artwork (public/brand/infinity-white-entry.webp) on a deep-navy tile.
 
-Usage: python3 -I scripts/build_favicons.py
+Usage: python3 -I scripts/build-favicons.py
 Writes public/favicon.svg (embeds a 256 px webp), favicon.ico (16/32/48), favicon-32.png,
 apple-touch-icon.png (180), icon-192.png, icon-512.png.
 """

@@ -30,6 +30,8 @@ try {
   await page.locator('#f-name').fill('Compatibility test');
   await page.locator('#f-email').fill('test@example.com');
   await page.locator('#f-idea').fill('Local mocked request.');
+  // a person takes a few seconds: submissions within MIN_FILL_MS (3 s) of the form appearing are treated as bots
+  await page.waitForTimeout(3300);
   await page.locator('.contact__send').click();
   await page.locator('.contact__form.is-error').waitFor();
   assert.equal(await page.locator('#f-idea').inputValue(), 'Local mocked request.');

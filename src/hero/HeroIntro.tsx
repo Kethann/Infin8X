@@ -8,8 +8,6 @@ import { WordmarkReveal } from '../components/WordmarkReveal';
 import { Icon } from '../components/Icon';
 
 gsap.registerPlugin(ScrollTrigger);
-const SEEN_KEY = 'infin8x:intro-seen';
-const seen = () => { try { return sessionStorage.getItem(SEEN_KEY) === '1'; } catch { return false; } };
 
 /** The intro plays at twice its authored pace (all timings above stay relative to each other). */
 const INTRO_SPEED = 2;
@@ -42,7 +40,6 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
     const wordmarkBeams=root.querySelectorAll('[data-wordmark-beam]');
     const finish = () => {
       if (disposed) return;
-      try { sessionStorage.setItem(SEEN_KEY, '1'); } catch { /* private browsing */ }
       gsap.set(wordmark,{clearProps:'opacity,transform'});
       setPlaying(false); root.classList.add('is-settled'); onIntroDone?.();
       window.dispatchEvent(new CustomEvent('infin8x:intro-done'));
@@ -64,7 +61,6 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
       onRefresh: self => applyExit(self.progress, 0),
     });
     const ctx = gsap.context(() => {}, root);
-    const short = seen();
     skipRef.current = false;
     root.classList.remove('is-settled', 'hero--sculpture');
     setPlaying(!reduced && !lite);
@@ -104,11 +100,11 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
         const tl = gsap.timeline({paused:true, onComplete:finish});
         // Incoming energy builds the white ribbon, then the colour ribbon as it is absorbed. The shared tween keeps
         // absorption and formation locked together, including seeking and repeat visits.
-        const S = short ? 0.55 : 1, st = scene.state;
+        const S = 1, st = scene.state;   // the full intro every visit (no shortened repeat)
         const formationDuration=4.8*S;
         // Give repeat visits a readable opening too. Zero starting velocity lets
         // the outer fibres emerge gently before their inward movement gathers pace.
-        const openingDuration=short ? 0.95 : 1.35;
+        const openingDuration=1.35;
         tl.to(st, {aurora:1, duration:openingDuration, ease:'sine.inOut'}, 0)
           .to(st, {rush:1, duration:openingDuration*0.8, ease:'sine.inOut'}, openingDuration*0.2)
           .addLabel('absorb', openingDuration)
@@ -120,7 +116,7 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
           .to(st, {turn:1, duration:2.6*S, ease:'power2.out'}, 'absorb')
           .to(st, {sweep:1, duration:formationDuration, ease:'sine.inOut'}, 'absorb')
           .to(st, {rush:0, duration:1.1*S, ease:'sine.inOut'}, `formed-=${1.1*S}`);
-        const W=short ? 0.72 : 1;
+        const W=1;
         const wordmarkStart=tl.labels.formed-0.35*S;
         tl.addLabel('wordmark',wordmarkStart)
           .addLabel('wordmarkReady',wordmarkStart+1.15*W)

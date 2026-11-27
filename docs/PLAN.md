@@ -25,7 +25,7 @@ does it on the GPU in about 10 draw calls per frame. The **SVG path is still the
 `?debug` overlay, the favicon, the Process section and the progress beam all use it, and the canvas samples the same path.
 
 ## Logo geometry
-`scripts/build_assets.py` fits the centreline from the PNG's alpha mask: rays cast from each lobe centre find the midpoint
+`scripts/build-assets.py` fits the centreline from the PNG's alpha mask: rays cast from each lobe centre find the midpoint
 of the tube, and a Catmull-Rom → cubic Bézier conversion smooths them. **100% of sampled curve points land on the tube.**
 The path uses the PNG's native space (`viewBox 0 0 1904 610`) rather than 400×200, so the overlay is exact with no scaling.
 Visit `/?debug` to see it drawn over the artwork.

@@ -107,14 +107,21 @@ export const contact = {
   emailFallback: 'Email your message instead',
   socialFallback: 'Contact us on LinkedIn',
   timelines: ['ASAP', '1–2 months', '3+ months', 'Flexible'],
+  required: 'Required',
+  /** shown under a field once it has been left, read out to screen readers */
+  errors: {
+    name: { required: 'Please enter your name.', short: 'Your name needs at least 2 letters.', long: 'Please keep your name under 80 characters.', format: 'Use letters only (spaces, hyphens and apostrophes are fine).' },
+    email: { required: 'Please enter your email.', short: 'Please enter a full email address.', long: 'Please use a shorter email address.', format: 'Please enter a valid email, like name@example.com.' },
+    idea: { required: 'Please tell us about your project.', short: 'Please add a little more detail (at least 20 characters).', long: 'Please keep it under 2000 characters.', spam: 'Please describe your project in a few words (not just links or repeated characters).' },
+    budget: { long: 'Please keep the budget under 80 characters.', format: 'Use letters, numbers and currency symbols only.' },
+  } as Record<string, Record<string, string>>,
+  cooldown: 'Thanks. You can send another message in a minute.',
 };
 
 export const work = {
   eyebrow: 'Work',
   title: 'Selected work.',
   lead: 'A selection of websites and portfolios.',
-  footer: 'Have a project in mind?',
-  footerLink: 'Start a conversation',
   empty: 'No projects in this category yet.',
   emptyLink: 'View all projects',
   galleryHint: 'Pick a project. Step inside.',

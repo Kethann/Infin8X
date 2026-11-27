@@ -23,7 +23,9 @@ for (const [name, cores, memory, renderer, saveData, expected] of [
   runInNewContext(code, { exports, window: {}, navigator: { hardwareConcurrency: cores, deviceMemory: memory, connection: { saveData } },
     document: { createElement: () => ({ getContext: () => gl }) }, location: { search: '' }, URLSearchParams });
   assert.equal(exports.canPlayIntro(), expected, name);
-  if (expected) assert.equal(exports.isLowEnd(), true, `${name}: still keep the heavy site background lightweight`);
+  // Phones and tablets report ≤4 GB even with a strong GPU: they keep the animated site on its compressed budget
+  // (isConstrained); only ≤2 cores / ≤2 GB (or Data Saver / software WebGL) get the still site.
+  if (expected) assert.equal(exports.isLowEnd(), cores <= 2 || (memory ?? 8) <= 2, `${name}: still site only on truly low-end hints`);
   console.log(`PASS intro eligibility: ${name}`);
 }
 

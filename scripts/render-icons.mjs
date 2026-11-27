@@ -1,8 +1,8 @@
-// Render the Open Graph image from the brand assets. Usage: node scripts/render_icons.mjs
+// Render the Open Graph image from the brand assets. Usage: node scripts/render-icons.mjs
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
 const b = await chromium.launch({ executablePath: process.env.CHROME ?? '/usr/bin/google-chrome' });
-// favicons now come from scripts/build_favicons.py (hero artwork); this script renders only the OG image
+// favicons now come from scripts/build-favicons.py (hero artwork); this script renders only the OG image
 const sg = readFileSync('node_modules/@fontsource/space-grotesk/files/space-grotesk-latin-700-normal.woff2').toString('base64');
 const logo = readFileSync('public/brand/infin8x-logo-1904.webp').toString('base64');
 const p = await b.newPage({ viewport: { width: 1200, height: 630 } });

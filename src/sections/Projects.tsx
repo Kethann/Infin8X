@@ -146,7 +146,6 @@ export function Projects() {
             </div>}
           </div>
         )}
-        <div className="work__footer" data-reveal><span>{work.footer}</span><a href="#contact">{work.footerLink} <Icon name="arrow" size={14} /></a></div>
       </div>
     </section>
   );

@@ -6,6 +6,8 @@
  *   CONTACT_TO       inbox that receives ideas
  *   CONTACT_FROM     verified sender, e.g. "Infin8X <ideas@yourdomain.com>"
  */
+import { check, MIN_FILL_MS, type Field } from '../../src/lib/contactRules';
+
 interface Env { RESEND_API_KEY?: string; CONTACT_TO?: string; CONTACT_FROM?: string }
 type Ctx = { request: Request; env: Env };
 
@@ -17,12 +19,13 @@ export const onRequestPost = async ({ request, env }: Ctx) => {
   if (!env.RESEND_API_KEY || !env.CONTACT_TO || !env.CONTACT_FROM) return json(503, { error: 'not_configured', fallback: 'mailto' });
   let d: Record<string, string>;
   try { d = await request.json(); } catch { return json(400, { error: 'bad_json' }); }
-  if (d.company) return json(200, { ok: true }); // honeypot: silently accept bots
-  const name = String(d.name ?? '').trim().slice(0, 120);
-  const email = String(d.email ?? '').trim().slice(0, 200);
-  const idea = String(d.idea ?? '').trim().slice(0, 5000);
-  if (!name || !idea || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(422, { error: 'invalid' });
-  const budget = String(d.budget ?? '').slice(0, 80), timeline = String(d.timeline ?? '').slice(0, 80);
+  // bots: the hidden field filled, or sent faster than a person could fill the form; accept silently, send nothing
+  if (d.company || Number(d.elapsed) < MIN_FILL_MS) return json(200, { ok: true });
+  // the same rules as the form (src/lib/contactRules.ts): nothing the page would refuse gets through
+  const fields: Field[] = ['name', 'email', 'idea', 'budget'];
+  if (fields.some((f) => check(f, String(d[f] ?? '')) !== null)) return json(422, { error: 'invalid' });
+  const name = String(d.name).trim(), email = String(d.email).trim(), idea = String(d.idea).trim();
+  const budget = String(d.budget ?? '').trim(), timeline = String(d.timeline ?? '').slice(0, 40);
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },

@@ -550,16 +550,12 @@
 .work__empty { padding: 56px 0; }
 .work__empty h3 { font: 400 1.75rem var(--font-display); }
 .work__empty button { margin-top: 18px; min-height: 44px; border-bottom: 1px solid #77859a; font-size: .875rem; }
-/* closing rows: centred, one line (question + link side by side) */
-.work__footer, .skills__footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0 14px; margin-top: 24px; font-size: clamp(.8125rem, .76rem + .2vw, .875rem); text-align: center; }
-.work__footer > span, .skills__footer p { color: #9aa6b9; }
-/* desktop Work: the closing row starts at the screen's left edge, under the project details */
-@media (min-width: 960px) {
-  .work .work__footer { justify-content: flex-start; padding-left: calc((100% - clamp(28px, 3.6vw, 56px)) * .44 / 1.44 + clamp(28px, 3.6vw, 56px) + 4px); }
-}
-.work__footer a, .skills__footer a { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; color: #eef2f7; }
-.work__footer a .icon, .skills__footer a .icon { transition: transform .4s var(--ease-out); }
-.work__footer a:hover .icon, .skills__footer a:hover .icon { transform: translate(2px, -2px); }
+/* the Skills page's closing row: centred, one line (text + link side by side) */
+.skills__footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0 14px; margin-top: 24px; font-size: clamp(.8125rem, .76rem + .2vw, .875rem); text-align: center; }
+.skills__footer p { color: #9aa6b9; }
+.skills__footer a { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; color: #eef2f7; }
+.skills__footer a .icon { transition: transform .4s var(--ease-out); }
+.skills__footer a:hover .icon { transform: translate(2px, -2px); }
 
 /* ================= 05 SKILLS ================= */
 .skills { --font-body: Inter, system-ui, sans-serif; --font-label: Inter, system-ui, sans-serif; font-family: var(--font-body); }
@@ -764,7 +760,7 @@
 /* the form: one calm column of clearly outlined fields, labels in plain words above them (Manrope throughout) */
 .contact__form { min-width: 0; display: grid; gap: 14px 14px; padding: clamp(18px, 2.4vw, 30px); overflow: hidden; font-family: var(--font-read); }
 @media (min-width: 640px) { .contact__form { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.field { position: relative; display: grid; gap: 6px; min-width: 0; }
+.field { position: relative; display: grid; gap: 6px; min-width: 0; align-content: start; }   /* a neighbour's error never stretches this input */
 .field--wide { grid-column: 1 / -1; }
 .field > label, .choice legend { font: 600 .875rem/1.3 var(--font-read); letter-spacing: .005em; color: #d6dde9; }
 .field input, .field textarea { width: 100%; padding: 11px 14px; border-radius: 12px; font: 500 1rem/1.5 var(--font-read); color: #f1f4f9; background: rgba(10,15,27,.72);
@@ -773,7 +769,6 @@
 .field input::placeholder, .field textarea::placeholder { color: #8692a6; }
 .field input:hover, .field textarea:hover { box-shadow: inset 0 0 0 1px rgba(214,228,255,.26), inset 0 1px 2px rgba(0,0,0,.35); }
 .field input:focus, .field textarea:focus { outline: none; background: rgba(10,15,27,.9); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--section-accent) 70%, #fff), 0 0 0 4px color-mix(in srgb, var(--section-accent) 18%, transparent); }
-.field input:user-invalid, .field textarea:user-invalid { box-shadow: inset 0 0 0 1px var(--s-red); }
 /* a light draws along the bottom edge of the focused field */
 .field > i { position: absolute; left: 12px; right: 12px; bottom: 0; height: 1px; transform: scaleX(0); transform-origin: left; pointer-events: none;
   background: linear-gradient(90deg, transparent, #fff 30%, var(--section-accent) 70%, transparent); box-shadow: 0 0 10px var(--section-accent); transition: transform .8s var(--ease-light); }
@@ -789,6 +784,12 @@
 .choice__opt input:checked + span { color: #fff; background: color-mix(in srgb, var(--section-accent) 20%, rgba(255,255,255,.03));
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--section-accent) 60%, transparent), 0 6px 20px -10px var(--section-accent); }
 .choice__opt input:focus-visible + span { outline: 2px solid color-mix(in srgb, var(--section-accent) 70%, #fff); outline-offset: 3px; }
+/* required marker, live counter and inline errors */
+.field__req { margin-left: 8px; font: 600 .6875rem/1 var(--font-read); letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--section-accent) 62%, #fff); }
+.field__count { justify-self: end; margin-top: -2px; font: 500 .75rem/1 var(--font-read); color: #8f9ab0; font-variant-numeric: tabular-nums; }
+.field__error { font: 500 .8125rem/1.4 var(--font-read); color: #ff9fb0; }
+.field.is-invalid input, .field.is-invalid textarea { box-shadow: inset 0 0 0 1px #ff7a92; }
+.contact__send.is-disabled { opacity: .55; cursor: not-allowed; transform: none !important; }
 .contact__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding-top: 6px; }
 .contact__send { font-family: var(--font-read); font-weight: 700; letter-spacing: .01em; }
 @media (max-width: 639px) { .contact__send { width: 100%; justify-content: center; } }
