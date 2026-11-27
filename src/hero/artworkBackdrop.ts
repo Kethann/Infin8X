@@ -100,8 +100,16 @@ export async function createArtworkBackdrop(canvas: HTMLCanvasElement, reduced: 
       orientation.returning=true;
     };
     let width=1, height=1, scale=1, horizon=1;
+    // Layout boxes without the scroll lift (`--hero-exit` translates the canvas and the stage): a resize while
+    // scrolled — e.g. a phone's address bar showing or hiding — must not bake that offset into the logo.
+    const untransformed = (element: HTMLElement) => {
+      const box = element.getBoundingClientRect(), transform = getComputedStyle(element).transform;
+      if (!transform || transform === 'none') return box;
+      const m = new DOMMatrixReadOnly(transform);
+      return new DOMRect(box.left - m.m41, box.top - m.m42, box.width, box.height);
+    };
     const resize = () => {
-      const rect=canvas.getBoundingClientRect(), target=stage.getBoundingClientRect();
+      const rect=untransformed(canvas), target=untransformed(stage);
       width=Math.max(rect.width,1); height=Math.max(rect.height,1);
       // Bound the render buffer on Retina phones and large external displays.
       const pixelBudget=constrained ? 800_000 : isTouch() ? 2_500_000 : 5_000_000;

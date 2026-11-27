@@ -24,7 +24,10 @@ export function Home() {
     if (!sections) return;
     if (n >= sections.length) {
       requestAnimationFrame(() => { ScrollTrigger.refresh(); window.dispatchEvent(new Event('infin8x:sections-ready')); });
-      if (location.hash) requestAnimationFrame(() => document.querySelector(location.hash)?.scrollIntoView());
+      // read the hash once: it can change before the next frame (a finished jump tidies the URL), and an empty or
+      // malformed selector would throw
+      const hash = location.hash;
+      if (/^#[\w-]+$/.test(hash)) requestAnimationFrame(() => document.getElementById(hash.slice(1))?.scrollIntoView());
       return;
     }
     const w = window as IdleWin;

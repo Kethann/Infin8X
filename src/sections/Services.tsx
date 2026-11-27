@@ -87,7 +87,7 @@ export function Services() {
     <section id="services" className="section services-sec" data-chapter="services" data-chapter-label="Services"
       style={{ '--section-accent': accentVar(services.accent) } as CSSProperties} aria-labelledby="services-h">
       <div className="page">
-        <Chapter id="services" titleId="services-h" title={services.title} lead={services.lead} />
+        <Chapter id="services" titleId="services-h" title={services.title} lead={services.lead} script="title" />
         <div ref={grid} className="svc-grid" data-open={phone && open !== null ? '' : undefined}>
           {services.items.map((s, i) => {
             const isOpen = phone && open === i;
@@ -109,8 +109,8 @@ export function Services() {
                 </div>
                 <ServiceScene kind={s.icon} />
                 <ul className="svc__points">{s.points.map((p) => <li key={p}>{p}</li>)}</ul>
-                <a className="svc__link" href="#contact" aria-label={`${services.cta}: ${s.name}`}>
-                  <span>{services.cta}</span><Icon name="arrow" size={18} />
+                <a className="svc__link" href="#contact" aria-label={`${s.cta ?? services.cta}: ${s.name}`}>
+                  <span>{s.cta ?? services.cta}</span><Icon name="arrow" size={18} />
                 </a>
               </article>
             );

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { isLowEnd, prefersReducedMotion } from '../lib/env';
+import { isConstrained, isLowEnd, prefersReducedMotion } from '../lib/env';
 import type { LightFieldHandle as PrismFlowHandle } from '../three/lightField';
 
 /**
@@ -17,7 +17,8 @@ export function PrismFlow({ home }: { home: boolean }) {
     const start = () => import('../three/lightField').then(({ startLightField }) => {
       if (disposed) return;
       try {
-        handle = startLightField(canvas, { quality: innerWidth < 900 ? 'low' : 'high', reduced: prefersReducedMotion() });
+        // phones, tablets and modest machines: the compressed budget (fewer particles and logos, lower resolution, 30 fps)
+        handle = startLightField(canvas, { quality: isConstrained() ? 'low' : 'high', reduced: prefersReducedMotion() });
       } catch (err) { console.warn('[background] falling back to the still version', err); canvas.classList.add('prismflow--fallback'); return; }
       const st = ScrollTrigger.create({ start: 0, end: 'max', onUpdate: (s) => handle?.setProgress(s.progress, s.getVelocity()) });
       cleanups.push(() => st.kill());

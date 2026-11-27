@@ -18,7 +18,7 @@ export function Words({ text, offset = 0 }: { text: string; offset?: number }) {
  * Chapter header, shared by every section: the section name set large in outline behind the title (in the chapter's
  * spectrum colour), a title that resolves word by word under a passing light sweep, and a lead. No numbering.
  */
-export function Chapter({ id, title, lead, titleId, align = 'start' }: { id: ChapterId; title: string; lead?: string; titleId: string; align?: 'start' | 'center' }) {
+export function Chapter({ id, title, lead, titleId, align = 'start', script, hideTitle }: { id: ChapterId; title: string; lead?: string; titleId: string; align?: 'start' | 'center'; script?: 'title' | 'lead'; /** heading kept for screen readers only (the section name stands alone) */ hideTitle?: boolean }) {
   const c = chapter(id);
   const ghost = useRef<HTMLSpanElement>(null);
   const frame = useRef(0);
@@ -45,8 +45,10 @@ export function Chapter({ id, title, lead, titleId, align = 'start' }: { id: Cha
   return (
     <header className={`chapter chapter--${align}`} onPointerMove={onMove} onPointerLeave={onLeave}>
       <span ref={ghost} className="chapter__ghost" aria-hidden="true" data-reveal>{c.label}</span>
-      <h2 id={titleId} className="chapter__title" data-reveal="words"><Words text={title} /></h2>
-      {lead && <p className="chapter__lead" data-reveal="words"><Words text={lead} offset={2} /></p>}
+      {hideTitle
+        ? <h2 id={titleId} className="sr-only">{title}</h2>
+        : <h2 id={titleId} className={`chapter__title${script === 'title' ? ' script-copy' : ''}`} data-reveal="words"><Words text={title} /></h2>}
+      {lead && <p className={`chapter__lead${script === 'lead' ? ' script-copy' : ''}`} data-reveal="words"><Words text={lead} offset={2} /></p>}
     </header>
   );
 }

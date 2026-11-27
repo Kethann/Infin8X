@@ -70,10 +70,6 @@ export function Skills() {
       <div className="page">
         <div className="skills__head">
           <Chapter id="skills" titleId="skills-h" title={copy.title} lead={copy.lead} />
-          <dl className="skills__stats">
-            <div><dt>Disciplines</dt><Count to={skillCategories.length} /></div>
-            <div><dt>Tools & capabilities</dt><Count to={total} /></div>
-          </dl>
         </div>
 
         <div className="skills__body">
@@ -91,6 +87,19 @@ export function Skills() {
         {/* Keep filters above the changing preview so selecting a skill cannot move their click targets. */}
         <div className="skills__preview">
           <SkillCloud items={items} active={active} />
+            {/* the numbers live inside the preview banner, as an aside on its right (a strip along its foot on phones) */}
+            <dl className="skills__stats">
+            <div className="stat">
+              <Count to={skillCategories.length} />
+              <dt>{copy.statDisciplines}</dt>
+              <span className="stat__note" aria-hidden="true">{copy.statDisciplinesNote(skillCategories[0].name, skillCategories[skillCategories.length - 1].name)}</span>
+            </div>
+            <div className="stat">
+              <Count to={total} />
+              <dt>{copy.statTools}</dt>
+              <span className="stat__note" aria-hidden="true">{copy.statToolsNote(skillCategories.length)}</span>
+            </div>
+          </dl>
         </div>
 
         <div className="skills__catalogue">

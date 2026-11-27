@@ -128,8 +128,8 @@ export function Nav({ home }: { home: boolean }) {
           {chapters.map((c, i) => (
             <li key={c.id} style={{ '--i': i, '--k': `var(--s-${c.accent})` } as CSSProperties}>
               <Go to={href(chapterHref(c.id))} aria-current={active === c.id ? 'location' : undefined} onClickCapture={() => setOpen(false)}>
+                <span className="nav__sheet-chip" aria-hidden="true"><Icon name={`nav-${c.id}`} size={15} /></span>
                 <span className="nav__sheet-label">{c.label}</span>
-                <Icon name={`nav-${c.id}`} size={18} />
               </Go>
             </li>
           ))}

@@ -25,15 +25,25 @@ export const isSoftwareGL = () => glInfo().software;
 /** `?gl=force` bypasses the low-end checks (testing 3D in headless browsers). */
 export const forceGL = () => isBrowser && new URLSearchParams(location.search).get('gl') === 'force';
 
-/** Heuristic low-end check: few cores, little memory, data saver, or software-only WebGL. */
+/**
+ * Truly low-end: Data Saver, software-only WebGL (also how Lighthouse runs), or ≤2 cores / ≤2 GB. These get the still
+ * site. Phones and tablets typically report 4 GB (browsers cap the hint) even with a strong GPU: those are only
+ * "constrained" (see below) and keep the animations at a compressed budget.
+ */
 export function isLowEnd() {
   if (!isBrowser) return true;
   if (forceGL()) return false;
   const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
   if (nav.connection?.saveData) return true;
-  if ((nav.hardwareConcurrency ?? 8) <= 4) return true;
-  if ((nav.deviceMemory ?? 8) <= 4) return true;
+  if ((nav.hardwareConcurrency ?? 8) <= 2) return true;
+  if ((nav.deviceMemory ?? 8) <= 2) return true;
   return isSoftwareGL();
+}
+/** Animated, but on a budget: touch devices, small screens, or ≤4 cores / ≤4 GB. */
+export function isConstrained() {
+  if (!isBrowser) return true;
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  return isTouch() || innerWidth < 900 || (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4;
 }
 /**
  * The intro has its own rendering budget. CPU/RAM hints tune its quality, never exclude a phone with a real GPU.

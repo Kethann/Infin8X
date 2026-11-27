@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
 import { Route, Switch, useLocation } from 'wouter';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -71,10 +71,16 @@ function useSmoothScroll(reduced: boolean) {
  * `data-reveal="draw"` draws its light lines. Never hides content on reduced-motion or low-power devices.
  */
 function useReveals(key: string, reduced: boolean) {
+  // the class that hides not-yet-revealed elements is set before the first paint and stays across route changes:
+  // removing and re-adding it per route let each new page paint fully visible, then snap hidden and animate in
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    if (reduced || isLowEnd()) { root.classList.remove('motion'); return; }
+    root.classList.add('motion');
+    return () => root.classList.remove('motion');
+  }, [reduced]);
   useEffect(() => {
     if (reduced || isLowEnd()) return;
-    const root = document.documentElement;
-    root.classList.add('motion');
     const io = new IntersectionObserver((entries) => {
       let n = 0;
       for (const e of entries) {
@@ -93,7 +99,6 @@ function useReveals(key: string, reduced: boolean) {
     window.addEventListener('infin8x:sections-ready', bind);
     return () => {
       io.disconnect(); mo.disconnect(); window.removeEventListener('infin8x:sections-ready', bind);
-      root.classList.remove('motion');
     };
   }, [key, reduced]);
 }

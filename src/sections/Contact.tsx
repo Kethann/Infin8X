@@ -52,14 +52,7 @@ export function Contact() {
       style={{ '--section-accent': accentVar(contact.accent) } as CSSProperties} aria-labelledby="contact-h">
       <div className="page contact__grid">
         <aside className="contact__aside">
-          <Chapter id="contact" titleId="contact-h" title={contact.title} lead={contact.lead} />
-          <div className="contact__direct" data-reveal>
-            <p>{contact.direct}</p>
-            <ul>
-              {hasEmail && <li><a href={`mailto:${brand.email}`}>{brand.email}</a></li>}
-              <li><a href={brand.links.linkedin} target="_blank" rel="noopener noreferrer">{brand.contactName} · LinkedIn <Icon name="arrow" size={14} /></a></li>
-            </ul>
-          </div>
+          <Chapter id="contact" titleId="contact-h" title={contact.title} lead={contact.lead} script="title" />
         </aside>
 
         <form className={`contact__form is-${status}`} onSubmit={submit} aria-busy={status === 'sending'} onChange={() => { if (status === 'sent' || status === 'error') setStatus('idle'); }} noValidate data-reveal data-light>

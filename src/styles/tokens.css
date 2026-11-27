@@ -28,10 +28,11 @@
   --font-body: 'Unique', Inter, system-ui, sans-serif;                          /* paragraphs, UI copy, form fields */
   --font-name: 'Bricolage Grotesque Variable', 'Manrope Variable', system-ui, sans-serif; /* project names, About principles: characterful, easy to read big */
   --font-read: 'Manrope Variable', Inter, system-ui, sans-serif;                 /* section descriptions: open, highly legible at small sizes */
-  --font-label: 'Biscora', 'Space Grotesk', system-ui, sans-serif;              /* condensed caps: small tracked labels, tags */
-  --font-figure: 'Biscora', 'Space Grotesk', system-ui, sans-serif;             /* condensed caps set big: project names, stats */
+  --font-label: 'Biscora Amp', 'Biscora', 'Space Grotesk', system-ui, sans-serif;              /* condensed caps: small tracked labels, tags */
+  --font-figure: 'Biscora Amp', 'Biscora', 'Space Grotesk', system-ui, sans-serif;             /* condensed caps set big: project names, stats */
   --font-ghost: 'Esthoria', 'Baserona', Georgia, serif;                         /* serif italic: the faded section names only (letters only) */
   --font-accent: 'Epstonik', 'Unique', system-ui, sans-serif;                   /* the "Infinite Experience" reading only */
+  --font-script: 'Lightning Crashes', 'Segoe Script', cursive;                  /* selected handwritten headings and principles */
 
   /* type: fluid scale */
   --fs-mono: clamp(0.75rem, 0.72rem + 0.15vw, 0.875rem);

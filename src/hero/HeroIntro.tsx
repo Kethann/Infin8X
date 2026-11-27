@@ -49,15 +49,19 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
     };
     root.classList.remove('hero--lite', 'hero--artwork', 'hero--sculpture', 'hero--atmosphere');
     root.classList.add(lite ? 'hero--lite' : 'hero--artwork');
+    const applyExit = (progress:number, velocity:number) => {
+      heroScroll=progress;
+      backdrop?.scroll(heroScroll,velocity);
+      root.style.setProperty('--hero-exit', progress.toFixed(4));
+      const fade=Math.min(1,progress/0.85);
+      root.style.setProperty('--hero-atmosphere-opacity', (1-fade*fade*(3-2*fade)).toFixed(4));
+      window.dispatchEvent(new CustomEvent('infin8x:hero-progress', {detail:progress}));
+    };
+    // A refresh (resize, e.g. a phone's address bar returning as the page reaches the top) recomputes the progress
+    // without calling onUpdate: apply it there too, or the hero stays lifted as if still scrolled.
     const exit = ScrollTrigger.create({ trigger: root, start: 'top top', end: 'bottom top', scrub: true,
-      onUpdate: self => {
-        heroScroll=self.progress;
-        backdrop?.scroll(heroScroll,self.getVelocity());
-        root.style.setProperty('--hero-exit', self.progress.toFixed(4));
-        const fade=Math.min(1,self.progress/0.85);
-        root.style.setProperty('--hero-atmosphere-opacity', (1-fade*fade*(3-2*fade)).toFixed(4));
-        window.dispatchEvent(new CustomEvent('infin8x:hero-progress', {detail:self.progress}));
-      },
+      onUpdate: self => applyExit(self.progress, self.getVelocity()),
+      onRefresh: self => applyExit(self.progress, 0),
     });
     const ctx = gsap.context(() => {}, root);
     const short = seen();
@@ -245,10 +249,10 @@ export function HeroIntro({ onIntroDone }: { onIntroDone?: () => void }) {
       <div className="hero__details">
         <div className="hero__brand"><WordmarkReveal /></div>
         <p className="hero__tagline" data-reveal>{brand.coreLine}</p>
-        <p className="hero__summary" data-reveal>{brand.servicesLine}</p>
+        <p className="hero__summary script-copy" data-reveal>{brand.servicesLine}</p>
         <div className="hero__ctas" data-reveal>
-          <a className="btn btn--primary" href="#contact">{brand.projectCta}<Icon name="arrow" size={15} /></a>
-          <a className="btn btn--ghost" href="#projects">{brand.workCta}<Icon name="down" size={15} /></a>
+          <a className="btn btn--primary" href="#contact">{brand.projectCta}<span className="btn__chip" aria-hidden="true"><Icon name="arrow" size={15} /></span></a>
+          <a className="btn btn--ghost" href="#projects">{brand.workCta}<span className="btn__chip" aria-hidden="true"><Icon name="down" size={15} /></span></a>
         </div>
       </div>
       {playing && <button type="button" className="hero__skip" onClick={() => { skipRef.current = true; tlRef.current?.progress(1); }}>Skip intro <span aria-hidden="true">→</span></button>}

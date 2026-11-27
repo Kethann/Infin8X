@@ -62,17 +62,26 @@ export async function checkViewport(browser, base, width, height, { mobile = fal
     await page.keyboard.press('End');
     assert.equal(await page.locator('.pen__tab').last().getAttribute('aria-selected'), 'true');
     await page.keyboard.press('Escape');
-    await page.getByRole('button', { name: 'Open menu', exact: true }).click();
-    await page.locator('#mobile-menu a').last().scrollIntoViewIfNeeded();
-    const menu = await page.locator('#mobile-menu').boundingBox();
-    assert.ok(menu.y >= 0 && menu.y + menu.height <= height + 1, `${label}: menu outside viewport`);
-    await page.keyboard.press('Escape');
-    assert.equal(await page.locator('#mobile-menu').isVisible(), false);
-    assert.equal(await page.locator('#main').evaluate(el => el.inert), false);
-    assert.notEqual(await page.locator('body').evaluate(el => el.style.overflow), 'hidden');
-    // Real route from the menu, then a category at the end of the horizontally scrolling filters.
-    await page.getByRole('button', { name: 'Open menu', exact: true }).click();
-    await page.locator('#mobile-menu a[href="/skills"]').click();
+    // The menu button exists under 360px and from 1000px; 360–999px uses the icon pill instead (by design).
+    const toggle = page.getByRole('button', { name: 'Open menu', exact: true });
+    const hasMenu = await toggle.isVisible();
+    if (hasMenu) {
+      await toggle.click();
+      await page.locator('#mobile-menu a').last().scrollIntoViewIfNeeded();
+      const menu = await page.locator('#mobile-menu').boundingBox();
+      assert.ok(menu.y >= 0 && menu.y + menu.height <= height + 1, `${label}: menu outside viewport`);
+      await page.keyboard.press('Escape');
+      assert.equal(await page.locator('#mobile-menu').isVisible(), false);
+      assert.equal(await page.locator('#main').evaluate(el => el.inert), false);
+      assert.notEqual(await page.locator('body').evaluate(el => el.style.overflow), 'hidden');
+    }
+    // Real route from the menu (or the icon pill), then a category at the end of the horizontally scrolling filters.
+    if (hasMenu) {
+      await toggle.click();
+      await page.locator('#mobile-menu a[href="/skills"]').click();
+    } else {
+      await page.locator('.nav__links a[href="/skills"]').click();
+    }
     await page.waitForURL('**/skills');
     await page.locator('.ledger__group').first().waitFor();
     await page.locator('.skills__filters button').last().click();

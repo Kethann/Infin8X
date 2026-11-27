@@ -23,7 +23,6 @@ export function Projects() {
   const list = useMemo(() => projects.filter((p) => cat === 'All' || p.category === cat), [cat]);
   const [activeSlug, setActive] = useState<string | undefined>(list[0]?.slug);
   const reduced = useReducedMotion();
-  const [paused, setPaused] = useState(false);
   const [inView, setInView] = useState(false);
   const splitRef = useRef<HTMLDivElement>(null);
   // Manual inspection holds the chosen project until the pointer/focus leaves.
@@ -43,7 +42,7 @@ export function Projects() {
     return () => observer.disconnect();
   }, [wide]);
   useEffect(() => {
-    if (!wide || !inView || reduced || paused || hovered || list.length < 2) return;
+    if (!wide || !inView || reduced || hovered || list.length < 2) return;
     let timer = 0;
     const schedule = () => {
       window.clearInterval(timer);
@@ -54,7 +53,7 @@ export function Projects() {
     schedule();
     document.addEventListener('visibilitychange', schedule);
     return () => { window.clearInterval(timer); document.removeEventListener('visibilitychange', schedule); };
-  }, [wide, inView, reduced, paused, hovered, list]);
+  }, [wide, inView, reduced, hovered, list]);
   const filter = (c: typeof cat) => { setCat(c); setHovered(null); setActive(projects.find((p) => c === 'All' || p.category === c)?.slug); };
   const active = list.find((p) => p.slug === activeSlug) ?? list[0];
   const expanded = hovered ?? (reduced ? null : active?.slug);
@@ -64,7 +63,7 @@ export function Projects() {
       style={{ '--section-accent': accentVar(work.accent) } as CSSProperties} aria-labelledby="projects-h">
       <div className="page">
         <div className="work__head">
-          <Chapter id="projects" titleId="projects-h" title={work.title} lead={work.lead} />
+          <Chapter id="projects" titleId="projects-h" title={work.title} lead={work.lead} script="lead" hideTitle />
           <div className="work__filters" role="group" aria-label="Filter projects" data-reveal>
             {categories.map((c) => {
               const n = projects.filter((p) => c === 'All' || p.category === c).length;
@@ -131,17 +130,20 @@ export function Projects() {
                     </TransitionLink>
                   ))}
                 </div>
-                {!reduced && <button className="reel__playback" type="button" onClick={() => { setPaused(value => !value); setHovered(null); }}>
-                  <span aria-hidden="true">{paused ? '▷' : 'Ⅱ'}</span>{paused ? work.playPreview : work.pausePreview}
-                </button>}
-                <div className="reel__info" key={active.slug} style={{ '--c': accentVar(active.accent) } as CSSProperties}>
-                  <p className="reel__cat"><i aria-hidden="true" />{active.discipline}</p>
-                  <p className="reel__summary">{active.summary}</p>
-                  <ul className="reel__tags">{active.tags.map((t) => <li key={t}>{t}</li>)}</ul>
-                  <TransitionLink to={`/work/${active.slug}`} className="reel__cta" tabIndex={-1} aria-hidden="true">{work.projectLink} <Icon name="arrow" size={16} /></TransitionLink>
-                </div>
               </div>
             )}
+            {/* the selected project: its name and discipline on the left, what it is and the way in on the right */}
+            {wide && active && <div className="reel__info" key={active.slug} style={{ '--c': accentVar(active.accent) } as CSSProperties}>
+              <div className="reel__head">
+                <p className="reel__cat"><i aria-hidden="true" />{active.discipline}</p>
+                <h3 className="reel__title">{active.name}</h3>
+              </div>
+              <div className="reel__body">
+                <p className="reel__summary">{active.summary}</p>
+                <ul className="reel__tags">{active.tags.map((t) => <li key={t}>{t}</li>)}</ul>
+                <TransitionLink to={`/work/${active.slug}`} className="reel__cta" tabIndex={-1} aria-hidden="true">{work.projectLink} <Icon name="arrow" size={16} /></TransitionLink>
+              </div>
+            </div>}
           </div>
         )}
         <div className="work__footer" data-reveal><span>{work.footer}</span><a href="#contact">{work.footerLink} <Icon name="arrow" size={14} /></a></div>

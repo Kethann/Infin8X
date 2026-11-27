@@ -181,15 +181,9 @@ export function Process() {
     <section id="process" className="section process" data-chapter="process" data-chapter-label="Process"
       style={{ '--section-accent': accentVar(processSteps.accent) } as CSSProperties} aria-labelledby="process-h">
       <div className="page">
-        <Chapter id="process" titleId="process-h" title={processSteps.title} lead={processSteps.lead} />
+        <Chapter id="process" titleId="process-h" title={processSteps.title} lead={processSteps.lead} script="title" />
         <div ref={root} className={`pen${animated ? ' pen--anim' : ''}${lite ? ' pen--lite' : ''}`} data-in={entered || undefined}
           data-live={inView || undefined} data-open={open !== null || undefined}>
-          {/* Quiet, repeated typography behind the pen; never part of the controls or reading order. */}
-          <div className="pen__typewall" aria-hidden="true">
-            {Array.from({ length: 9 }, (_, i) => (
-              <span key={i} className="pen__typeline">{processSteps.backdropText}</span>
-            ))}
-          </div>
           <div ref={stage} className="pen__stage" onPointerMove={onTilt} onPointerLeave={onLeave}
             onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(null); }}
             style={{ aspectRatio: `${VB.w} / ${VB.h}`, '--c': SPEC[active] } as CSSProperties}>

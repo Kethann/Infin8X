@@ -197,20 +197,21 @@ float coc(float d){
 float hash(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 vec3 aces(vec3 x){ return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
 void main(){
-  float c0 = coc(texture2D(uDepth, vUv).r);
+  vec2 uv = vUv;
+  float c0 = coc(texture2D(uDepth, uv).r);
   float r = c0 * uMaxR;
-  vec3 sum = texture2D(uColor, vUv).rgb; float wsum = 1.0;
+  vec3 sum = texture2D(uColor, uv).rgb; float wsum = 1.0;
   // golden-angle disk, rotated per pixel: the blur reads as smooth grainless softness, never as repeated copies
   float rot = hash(gl_FragCoord.xy) * 6.2831853;
   for (int i = 0; i < 12; i++){
     float fi = float(i) + 0.5;
     float a = fi * 2.39996323 + rot;
     vec2 o = vec2(cos(a), sin(a)) * sqrt(fi / 12.0) * r * uTexel;
-    float ct = coc(texture2D(uDepth, vUv + o).r);
+    float ct = coc(texture2D(uDepth, uv + o).r);
     float w = mix(0.25, 1.0, smoothstep(0.0, 0.6, ct + 0.3 * c0));
-    sum += texture2D(uColor, vUv + o).rgb * w; wsum += w;
+    sum += texture2D(uColor, uv + o).rgb * w; wsum += w;
   }
-  vec3 base = sum / wsum + texture2D(uBloom, vUv).rgb * uBloomGain;
+  vec3 base = sum / wsum + texture2D(uBloom, uv).rgb * uBloomGain;
   vec3 col = aces(base * uExposure);
   gl_FragColor = vec4(pow(col, vec3(1.0 / 2.2)), 1.0);
 }`;
@@ -319,7 +320,8 @@ const QUAD_VERT = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(p
 export function startLightField(canvas: HTMLCanvasElement, opts: { quality: 'high' | 'low'; reduced: boolean }): LightFieldHandle {
   const high = opts.quality === 'high';
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: high, alpha: false, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, high ? 1.25 : 1));
+  // low: rendered at 80% of CSS pixels (soft depth of field and bloom hide it) — phones and tablets stay cool
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, high ? 1.25 : 0.8));
   renderer.setClearColor(0x000001, 1);
   renderer.autoClear = false;
 
@@ -482,8 +484,20 @@ export function startLightField(canvas: HTMLCanvasElement, opts: { quality: 'hig
   };
   const onMove = (ev: PointerEvent) => { if (ev.pointerType === 'mouse') mouseT.set(ev.clientX / innerWidth * 2 - 1, 1 - ev.clientY / innerHeight * 2); };
 
+  // the page's glass (the nav) reflects this light: publish its colour and where it stands, a few times a second
+  let lightPublished = -1;
+  const publishLight = () => {
+    if (time - lightPublished < 0.5 && lightPublished >= 0) return;
+    lightPublished = time;
+    const c = light.color, m = Math.max(c.r, c.g, c.b, 0.001);
+    const root = document.documentElement.style;
+    root.setProperty('--scene-light', `${Math.round(c.r / m * 255)} ${Math.round(c.g / m * 255)} ${Math.round(c.b / m * 255)}`);
+    root.setProperty('--sun-x', `${((THREE.MathUtils.clamp(light.x, -1, 1) * 0.5 + 0.5) * 100).toFixed(1)}%`);
+    root.setProperty('--sun-glow', (0.12 + 0.18 * light.day * (0.5 + 0.5 * light.elev)).toFixed(3));
+  };
   function updateLight() {
     clockLight(hour, time, light);
+    publishLight();
     key.color.copy(light.color); key.intensity = light.intensity;
     key.position.copy(light.dir).multiplyScalar(10);
     rim.color.copy(accent).lerp(tmpC.set(0x6fc4ff), 0.65);
@@ -528,8 +542,11 @@ export function startLightField(canvas: HTMLCanvasElement, opts: { quality: 'hig
     renderer.render(overlay, oCam);
   }
 
+  // low: ~30 fps is plenty for slow drifting light and halves the GPU work on phones and tablets
+  const minFrame = high ? 0 : 1000 / 30 - 2;
   const frame = (now: number) => {
     raf = requestAnimationFrame(frame);
+    if (now - last < minFrame) return;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     vis += (visT - vis) * (1 - Math.exp(-dt * 3)); dim += (dimT - dim) * (1 - Math.exp(-dt * 3));
     canvas.style.opacity = vis.toFixed(3);
