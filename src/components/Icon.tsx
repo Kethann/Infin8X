@@ -27,12 +27,14 @@ const paths: Record<string, string> = {
   sensor: 'M12 13.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM8.5 8.5a5 5 0 000 7M15.5 8.5a5 5 0 010 7M5.6 5.6a9 9 0 000 12.8M18.4 5.6a9 9 0 010 12.8',
   eye: 'M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12zM12 9a3 3 0 110 6 3 3 0 010-6z',
   // the top navigation's set: plain, recognisable objects
-  'nav-about': 'M12 11.5a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5zM4.75 20c.9-3.7 3.7-5.75 7.25-5.75S18.35 16.3 19.25 20',
-  'nav-services': 'M3.75 8.25h16.5v11H3.75zM8.75 8.25V5.5a1 1 0 011-1h4.5a1 1 0 011 1v2.75M3.75 13h16.5M10.5 13v1.75h3V13',
-  'nav-process': 'M12 3.75a8.25 8.25 0 110 16.5 8.25 8.25 0 010-16.5zM12 7.5V12l3 1.75M12 3.75v1.5M20.25 12h-1.5M12 20.25v-1.5M3.75 12h1.5',
-  'nav-projects': 'M3.75 7a1.25 1.25 0 011.25-1.25h4.5l2 2.25h7.5a1.25 1.25 0 011.25 1.25v8.5A1.25 1.25 0 0119 19H5a1.25 1.25 0 01-1.25-1.25z',
-  'nav-skills': 'M8.25 7.75L4 12l4.25 4.25M15.75 7.75L20 12l-4.25 4.25M13.25 5.5l-2.5 13',
-  'nav-contact': 'M20.5 3.5l-6 17-3.25-7.25L4 10zM20.5 3.5L11.25 13.25',
+  // nav marks, each echoing its section: two rings (design + code), the four service tiles, the pen nib, the split
+  // Work screen, a prism splitting light, a conversation
+  'nav-about': 'M9 7.25a4.75 4.75 0 100 9.5 4.75 4.75 0 100-9.5zM15 7.25a4.75 4.75 0 100 9.5 4.75 4.75 0 100-9.5z',
+  'nav-services': 'M4.5 4.5h6v6h-6zM13.5 4.5h6v6h-6zM4.5 13.5h6v6h-6zM16.5 12.75l3.75 3.75-3.75 3.75-3.75-3.75z',
+  'nav-process': 'M12 3.5l5 6.5-2 10h-6l-2-10zM12 3.5v6M12 9.5a1.5 1.5 0 100 3 1.5 1.5 0 100-3zM9.6 17h4.8',
+  'nav-projects': 'M3.75 5.25h16.5v13.5H3.75zM14.5 5.25v13.5M3.75 14.75h16.5',
+  'nav-skills': 'M11.5 5l6.5 12H5zM2.5 13.6l5.6-1.4M16.25 12.75l5.25-2.9M16.25 12.75h5.5M16.25 12.75l5.25 2.9',
+  'nav-contact': 'M4.5 5.5h15a1 1 0 011 1v9a1 1 0 01-1 1H11l-4.5 3.25V16.5h-2a1 1 0 01-1-1v-9a1 1 0 011-1zM8.5 11h7M8.5 13.5h4',
   replay: 'M4 12a8 8 0 108-8 8 8 0 00-5.7 2.3L4 8.5M4 4v4.5h4.5',
 };
 export type IconName = keyof typeof paths;
